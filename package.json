@@ -1,0 +1,24 @@
+{
+  "name": "swapy-identity-protocol",
+  "version": "1.0.0",
+  "description": "Swapy Identity Protocol",
+  "main": "truffle.js",
+  "scripts": {
+    "test": "scripts/test.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SwapyNetwork/swapy-identity-protocol.git"
+  },
+  "keywords": [
+    "Ethereum",
+    "Solidity",
+    "Identity"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/SwapyNetwork/swapy-identity-protocol/issues"
+  },
+  "homepage": "https://github.com/SwapyNetwork/swapy-identity-protocol#readme"
+}
