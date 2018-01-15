@@ -6,7 +6,14 @@ contract IdentityProtocol {
 
     address public owner;
 
-    mapping(address => address) identities;
+    mapping(address => mapping(address => uint)) identities;
+
+    event IdentityCreated(address _creator, address _identity);
+    
+    modifier onlyIdentityOwner(address identity) {
+        require(identities[identity][msg.sender] > 0);
+        _;
+    }
 
     function IdentityProtocol() 
         public
@@ -20,12 +27,17 @@ contract IdentityProtocol {
         returns(bool)
     {
         Identity identity = new Identity(identityData);
-        identities[msg.sender] = identity;
+        identities[identity][msg.sender] = now;
+        IdentityCreated(msg.sender, identity);
     }
 
 
-    function forwardTo(address to, uint256 value, bytes data) {
-        Identity identity = Identity(identities[msg.sender]);
+    function forwardTo(Identity identity, address to, uint256 value, bytes data) 
+        public
+        onlyIdentityOwner(identity)
+    {
         identity.forward(to,value,data);
     }
+
+
 }
