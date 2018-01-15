@@ -14,13 +14,12 @@ contract IdentityProtocol {
         require(identities[identity][msg.sender] > 0);
         _;
     }
-
+    
     function IdentityProtocol() 
         public
     {
         owner = msg.sender;
     }
-
 
     function createIdentity(bytes identityData)
         public 
@@ -31,7 +30,6 @@ contract IdentityProtocol {
         IdentityCreated(msg.sender, identity);
     }
 
-
     function forwardTo(Identity identity, address to, uint256 value, bytes data) 
         public
         onlyIdentityOwner(identity)
@@ -39,5 +37,11 @@ contract IdentityProtocol {
         identity.forward(to,value,data);
     }
 
+    function setIdentityData(Identity identity, bytes data) 
+        public
+        onlyIdentityOwner(identity)
+    {
+        identity.setFinancialData(data);
+    }
 
 }
