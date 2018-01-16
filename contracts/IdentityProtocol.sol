@@ -4,54 +4,46 @@ import './identity/Identity.sol';
 
 contract IdentityProtocol {
 
-    address public owner;
-
     mapping(address => mapping(address => uint)) identities;
 
-    event IdentityCreated(address _creator, address _identity);
-    event ForwardedTo(address _identity, address _owner, address _destination, uint256 _value, bytes data);
+    event IdentityCreated(address creator, address identity);
+    event ForwardedTo(address identity, address owner, address destination, uint256 value, bytes data);
 
-    modifier onlyIdentityOwner(address identity) {
-        require(isIdentityOwner(identity, msg.sender));
+    modifier onlyIdentityOwner(address _identity) {
+        require(isIdentityOwner(_identity, msg.sender));
         _;
     }
-    
-    function IdentityProtocol() 
-        public
-    {
-        owner = msg.sender;
-    }
 
-    function createIdentity(bytes identityData)
+    function createIdentity(bytes _identityData)
         public 
         returns(bool)
     {
-        Identity identity = new Identity(identityData);
+        Identity identity = new Identity(_identityData);
         identities[identity][msg.sender] = 1;
         IdentityCreated(msg.sender, identity);
     }
 
-    function forwardTo(Identity identity, address to, uint256 value, bytes data) 
+    function forwardTo(Identity _identity, address _to, uint256 _value, bytes _data) 
         public
-        onlyIdentityOwner(identity)
+        onlyIdentityOwner(_identity)
     {
-        identity.forward(to,value,data);
-        ForwardedTo(identity, msg.sender, to, value, data);
+        _identity.forward(_to,_value,_data);
+        ForwardedTo(_identity, msg.sender, _to, _value, _data);
     }
 
-    function setIdentityData(Identity identity, bytes data) 
+    function setIdentityData(Identity _identity, bytes _data) 
         public
-        onlyIdentityOwner(identity)
+        onlyIdentityOwner(_identity)
     {
-        identity.setFinancialData(data);
+        _identity.setFinancialData(_data);
     }
 
-    function isIdentityOwner(address identity, address _owner)
+    function isIdentityOwner(address _identity, address _owner)
         internal
         view
         returns(bool)
     {
-        return identities[identity][owner] == 1; 
+        return identities[_identity][_owner] == 1; 
     }
 
 }

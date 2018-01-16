@@ -15,7 +15,9 @@ contract Identity {
         financialData = _financialData;
     }
 
-    function forward(address to, uint256 value, bytes data) {
+    function forward(address to, uint256 value, bytes data) 
+        onlyOwner
+    {
         require(to.call.value(value)(data));
     }
 
