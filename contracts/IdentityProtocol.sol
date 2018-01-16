@@ -9,9 +9,10 @@ contract IdentityProtocol {
     mapping(address => mapping(address => uint)) identities;
 
     event IdentityCreated(address _creator, address _identity);
-    
+    event ForwardedTo(address _identity, address _owner, address _destination, uint256 _value, bytes data);
+
     modifier onlyIdentityOwner(address identity) {
-        require(identities[identity][msg.sender] > 0);
+        require(isIdentityOwner(identity, msg.sender));
         _;
     }
     
@@ -26,7 +27,7 @@ contract IdentityProtocol {
         returns(bool)
     {
         Identity identity = new Identity(identityData);
-        identities[identity][msg.sender] = now;
+        identities[identity][msg.sender] = 1;
         IdentityCreated(msg.sender, identity);
     }
 
@@ -35,6 +36,7 @@ contract IdentityProtocol {
         onlyIdentityOwner(identity)
     {
         identity.forward(to,value,data);
+        ForwardedTo(identity, msg.sender, to, value, data);
     }
 
     function setIdentityData(Identity identity, bytes data) 
@@ -42,6 +44,14 @@ contract IdentityProtocol {
         onlyIdentityOwner(identity)
     {
         identity.setFinancialData(data);
+    }
+
+    function isIdentityOwner(address identity, address _owner)
+        internal
+        view
+        returns(bool)
+    {
+        return identities[identity][owner] == 1; 
     }
 
 }
