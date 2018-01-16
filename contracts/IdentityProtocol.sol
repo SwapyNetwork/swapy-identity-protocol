@@ -21,6 +21,7 @@ contract IdentityProtocol {
         Identity identity = new Identity(_identityData);
         identities[identity][msg.sender] = 1;
         IdentityCreated(msg.sender, identity);
+        return true;
     }
 
     function forwardTo(Identity _identity, address _to, uint256 _value, bytes _data) 
