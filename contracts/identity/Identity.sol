@@ -10,19 +10,23 @@ contract Identity {
         _;
     }
 
-    function Identity(bytes _financialData) {
+    function Identity(bytes _financialData) 
+        public
+    {
         owner = msg.sender;
         financialData = _financialData;
     }
 
     function forward(address to, uint256 value, bytes data) 
         onlyOwner
+        public
     {
         require(to.call.value(value)(data));
     }
 
     function setFinancialData(bytes _financialData)
         onlyOwner
+        public
     {   
         financialData = _financialData;
     }

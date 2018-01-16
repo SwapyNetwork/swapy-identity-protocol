@@ -6,6 +6,7 @@ const should = require('chai')
     .should()
 const expect = require('chai').expect
 
+const ether = require('./helpers/ether')
 
 // --- Handled contracts
 const IdentityProtocol = artifacts.require("./IdentityProtocol.sol")
@@ -91,6 +92,7 @@ contract('IdentityProtocol', async accounts => {
             const args = event.args
             assert.equal(args.creator, identity.address, "The identity must be the owner of new identity" )
         })
+
     })
 
 })
