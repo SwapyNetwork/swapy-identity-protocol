@@ -27,7 +27,8 @@
     "truffle-hdwallet-provider": "0.0.3",
     "web3": "^0.18.4",
     "web3-provider-engine": "^8.6.1",
-    "zeppelin-solidity": "^1.4.0"
+    "zeppelin-solidity": "^1.4.0",
+    "ipfs-api": "^17.3.0"
   },
   "devDependencies": {},
   "repository": {
