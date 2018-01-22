@@ -25,22 +25,22 @@ contract('IdentityProtocol + IPFS integration', async accounts => {
         // Config ipfs provider
         ipfs.setProvider('ipfs.infura.io', '5001', 'https') 
         // create the root object
-        let tree = ipfs.initTree(false)
+        let treeHash = await ipfs.initTreeIpfs()
         // insert some nodes for test
-        ipfs.insertNode(tree, 'root', 'root_profile', null)
-        ipfs.insertNode(tree, 'root_profile', 'profile_name', 'Any User')
-        ipfs.insertNode(tree, 'root_profile', 'profile_email', 'any@email.com')
-        ipfs.insertNode(tree, 'root_profile', 'profile_phone', '1122224444')
-        ipfs.insertNode(tree, 'root_profile', 'profile_id', '123123123')
-        ipfs.insertNode(tree, 'root', 'root_financial', null)
-        ipfs.insertNode(tree, 'root_financial', 'financial_loan_requests', '3')
-        ipfs.insertNode(tree, 'root_financial', 'financial_investments', null)
-        ipfs.insertNode(tree, 'financial_investments', 'investments_2014', '2')
-        ipfs.insertNode(tree, 'financial_investments', 'investments_2015', '8')
-        // persist the tree on IPFS
-        firstHash = await ipfs.saveIpfsTree(tree)
+        treeHash = await ipfs.insertNodeIpfs(treeHash, 'root', 'root_profile', null)
+        treeHash = await ipfs.insertNodeIpfs(treeHash, 'root_profile', 'profile_name', 'Any User')
+        treeHash = await ipfs.insertNodeIpfs(treeHash, 'root_profile', 'profile_email', 'any@email.com')
+        treeHash = await ipfs.insertNodeIpfs(treeHash, 'root_profile', 'profile_phone', '1122224444')
+        treeHash = await ipfs.insertNodeIpfs(treeHash, 'root_profile', 'profile_id', '123123123')
+        treeHash = await ipfs.insertNodeIpfs(treeHash, 'root', 'root_financial', null)
+        treeHash = await ipfs.insertNodeIpfs(treeHash, 'root_financial', 'financial_loan_requests', '3')
+        treeHash = await ipfs.insertNodeIpfs(treeHash, 'root_financial', 'financial_investments', null)
+        treeHash = await ipfs.insertNodeIpfs(treeHash, 'financial_investments', 'investments_2014', '2')
+        treeHash = await ipfs.insertNodeIpfs(treeHash, 'financial_investments', 'investments_2015', '8')
         console.log('Logging the tree Before tests...')
-        console.log(tree)
+        const tree = await ipfs.getIpfsTree(treeHash)
+        console.log(JSON.stringify(tree))
+        firstHash = treeHash
     })
 
     context('Manage identities + IPFS data', () => {
@@ -59,10 +59,8 @@ contract('IdentityProtocol + IPFS integration', async accounts => {
             // get ipfs hash
             let storedIpfsData = await identity.financialData.call()
             storedIpfsData = web3.toAscii(storedIpfsData)
-            // get tree from ipfs by using the hash
-            let tree = await ipfs.getIpfsTree(storedIpfsData)
-            // searching the node 'root_profile'
-            const node = ipfs.dfs(tree, 'profile_phone')
+            // search the node 'root_profile'
+            const node = await ipfs.dfsIpfs(storedIpfsData, 'profile_phone')
             console.log("Retrieving 'profile_phone' ...")
             console.log(node)
         })
@@ -71,13 +69,8 @@ contract('IdentityProtocol + IPFS integration', async accounts => {
             // get ipfs hash
             let storedIpfsData = await identity.financialData.call()
             storedIpfsData = web3.toAscii(storedIpfsData)
-            // get tree from ipfs by using the hash
-            let tree = await ipfs.getIpfsTree(storedIpfsData)
-            // update the node 'profile_name' in memory
-            ipfs.updateNode(tree, 'profile_name', 'Some User')
-            // persist the new tree on IPFS
-            let ipfsHash = await ipfs.saveIpfsTree(tree)
-            // update the identity data into the blockchain 
+            // update the node 'profile_name' and get the new tree's hash
+            const ipfsHash = await ipfs.updateNodeIpfs(storedIpfsData, 'profile_name', 'Some User')
             await protocol.setIdentityData(
                 identity.address,
                 ipfsHash,
@@ -90,12 +83,8 @@ contract('IdentityProtocol + IPFS integration', async accounts => {
             // get ipfs hash
             let storedIpfsData = await identity.financialData.call()
             storedIpfsData = web3.toAscii(storedIpfsData)
-            // get tree from ipfs by using the hash
-            let tree = await ipfs.getIpfsTree(storedIpfsData)
-            // update the node 'root_financial' in memory
-            ipfs.removeNode(tree, 'root_financial')
-            // persist the new tree on IPFS
-            let ipfsHash = await ipfs.saveIpfsTree(tree)
+            // update the node 'root_financial' and get the new tree's hash
+            const ipfsHash = await ipfs.removeNodeIpfs(storedIpfsData, 'root_financial')
             // update the identity data into the blockchain 
             await protocol.setIdentityData(
                 identity.address,
@@ -116,7 +105,7 @@ contract('IdentityProtocol + IPFS integration', async accounts => {
         // get tree from ipfs by using the hash
         let tree = await ipfs.getIpfsTree(storedIpfsData)
         console.log('Logging the tree after tests...')
-        console.log(tree)
+        console.log(JSON.stringify(tree))
     })
 
 })
