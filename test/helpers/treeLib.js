@@ -1,76 +1,4 @@
 const sha3_256 = require('js-sha3').sha3_256;
-const ipfsAPI = require('ipfs-api')
-let ipfs = null;
-
-const setProvider = (host,port,protocol) => {
-    ipfs = ipfsAPI({host, port, protocol})
-}
-
-const getIpfsTree = (ipfsHash) => {
-    return new Promise((resolve, reject) => {
-        ipfs.files.get(`/ipfs/${ipfsHash}`, (err, data) => {
-            if(err) reject(err)
-            else resolve(JSON.parse(data[0].content.toString()))
-        })
-    })
-}
-
-const initTreeIpfs = async () => {
-    const tree = initTree()
-    const ipfsHash = await saveIpfsData(JSON.stringify(tree))
-    return ipfsHash
-}
-
-const saveIpfsData = (stringData) => {
-    const data = Buffer.from(stringData)
-    return new Promise((resolve, reject) => {
-        ipfs.files.add(data, (err, cid) => {
-            if(err) reject(err)
-            else resolve(cid[0].path)
-        })
-    }) 
-}
-
-const getIpfsData = (ipfsHash) => {
-    return new Promise((resolve, reject) => {
-        ipfs.files.get(`/ipfs/${ipfsHash}`, (err, data) => {
-            if(err) reject(err)
-            else resolve(data[0].content.toString())
-        })
-    })
-}
-
-const insertNodeIpfs = async (ipfsTreeHash, parentLabel, label, data, childrens = null) => {
-    let hash = null
-    if(data && !childrens) data = await saveIpfsData(data)
-    else hash = data      
-    const stringTree = await getIpfsData(ipfsTreeHash)
-    const tree = JSON.parse(stringTree)
-    insertNode(tree, parentLabel, label, hash, childrens)
-    return await saveIpfsData(JSON.stringify(tree))
-}
-
-const updateNodeIpfs = async (ipfsTreeHash, search, data) => {
-    const dataIpfsHash = await saveIpfsData(data)
-    const stringTree = await getIpfsData(ipfsTreeHash)
-    const tree = JSON.parse(stringTree)
-    updateNode(tree, search, dataIpfsHash)
-    return await saveIpfsData(JSON.stringify(tree))
-}
-
-const removeNodeIpfs = async (ipfsTreeHash, search, data) => {
-    const stringTree = await getIpfsData(ipfsTreeHash)
-    const tree = JSON.parse(stringTree)
-    removeNode(tree, search)
-    return await saveIpfsData(JSON.stringify(tree))
-}
-
-const dfsIpfs = async (ipfsTreeHash, search) => {
-    const stringTree = await getIpfsData(ipfsTreeHash)
-    const tree = JSON.parse(stringTree)
-    return dfs(tree, search)
-}
-
 
 // init tree structure
 const initTree = () => { 
@@ -141,7 +69,7 @@ const removeNode = (node, search) => {
 
 
 // renew node's hash following its childrens hashes
-const renewNodeHash = (node) => {
+const renewNodeHash = node => {
     if(node.childrens && node.childrens.length > 0)  { 
         let data = null;
         for(let j = 0; j < node.childrens.length; j++){
@@ -155,16 +83,8 @@ const renewNodeHash = (node) => {
     return node
 }
 
-module.exports = { 
-    setProvider,
+module.exports = {  
     initTree,
-    initTreeIpfs,
-    saveIpfsData,
-    getIpfsTree,
-    insertNodeIpfs,
-    updateNodeIpfs,
-    removeNodeIpfs,
-    dfsIpfs,
     insertNode,
     updateNode,
     removeNode,

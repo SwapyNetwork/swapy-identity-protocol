@@ -1,4 +1,5 @@
 const ipfs = require('./helpers/ipfsTree')
+const treeLib = require('./helpers/treeLib')
 
 const BigNumber = web3.BigNumber
 const signer = require('eth-signer')
