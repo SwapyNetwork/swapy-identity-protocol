@@ -1,6 +1,7 @@
 # Swapy Identity Protocol
 [![Join the chat at https://gitter.im/swapynetwork/general](https://badges.gitter.im/swapynetwork/general.svg)](https://gitter.im/swapynetwork/general?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build Status](https://travis-ci.org/SwapyNetwork/swapy-identity-protocol.svg?branch=master)](https://travis-ci.org/SwapyNetwork/swapy-identity-protocol)
 
 
 ## Table of Contents
