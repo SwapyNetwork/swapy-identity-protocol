@@ -18,7 +18,7 @@ const saveTree = jsonData => {
     return saveData(stringData)
 }
 
-const getTree = ipfsHash => {
+const getTree = async ipfsHash => {
     const stringTree = await getData(ipfsHash)
     return JSON.parse(stringTree)
 }
@@ -44,47 +44,35 @@ const getData = ipfsHash => {
 
 const dfs = async (ipfsTreeHash, search) => {
     const tree = await getTree(ipfsTreeHash)
+    console.log(tree)
     return treeLib.dfs(tree, search)
 }
 
-/*
-    insertion = {
-        parentLabel : string,
-        label : string,
-        data : string
-        or 
-        childrens: [{
-            label : string,
-            data: string
-            or 
-            childrens : [...]
-        }]
-    }
-
-*/
-
 const insertNodes = async (ipfsTreeHash, insertions) => {
     const tree = await getTree(ipfsTreeHash)
-    handleInsertions(tree, insertions)       
-    return await saveTree(tree)
+    await handleInsertions(tree, insertions)    
+    const treeHash = await saveTree(tree)
+    return treeHash
 }
 
-const handleInsertions = (tree, insertions, parentLabel = null) => {
-    insertions.forEach(insertion => {
+const handleInsertions = async (tree, insertions, parentLabel = null) => {
+    await insertions.forEach(async  insertion => {
         parentLabel = parentLabel ? parentLabel : insertion.parentLabel
         let data = null
+        let childrens = null
         if(!(insertion.childrens && insertion.childrens.length > 0)){
-            if(insertion.data) data = insertion.data 
+            if(insertion.data) {
+                data = insertion.data
+            }  
+            childrens = null            
         }
-        
+        if(data) data = await saveData(data)
+        treeLib.insertNode(tree, parentLabel, insertion.label, data)
+        if(insertion.childrens && insertion.childrens.length > 0)
+            await handleInsertions(tree, insertion.childrens, insertion.label)
+        return tree
     })
 } 
-
-/*let hash = null
-if(data && !childrens) data = await saveData(data)
-else hash = data      
-treeLib.insertNode(tree, parentLabel, label, hash, childrens)*/
-
 
 const updateNode = async (ipfsTreeHash, search, data) => {
     const dataIpfsHash = await saveData(data)
@@ -107,7 +95,7 @@ module.exports = {
     getTree,
     getData,
     dfs,
-    insertNode,
+    insertNodes,
     updateNode,
     removeNode,
 }
