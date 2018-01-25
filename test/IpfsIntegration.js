@@ -92,8 +92,8 @@ contract('IdentityProtocol + IPFS integration', async accounts => {
             let storedIpfsData = await identity.financialData.call()
             storedIpfsData = web3.toAscii(storedIpfsData)
             // search the node 'root_profile'
-            const node = await ipfs.dfs(storedIpfsData, 'profile_phone')
-            console.log("Retrieving 'profile_phone' ...")
+            const node = await ipfs.dfs(storedIpfsData, 'root_profile', false)
+            console.log("Retrieving 'root_profile' ...")
             console.log(node)
         })
 

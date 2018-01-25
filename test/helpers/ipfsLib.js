@@ -42,11 +42,27 @@ const getData = ipfsHash => {
     })
 }
 
-const dfs = async (ipfsTreeHash, search) => {
+const dfs = async (ipfsTreeHash, search, fetchData = false) => {
     const tree = await getTree(ipfsTreeHash)
-    return treeLib.dfs(tree, search)
+    let result = treeLib.dfs(tree, search)
+    if(result && fetchData) {
+        result = await fetchNodeData(result)
+    }
+    return result
 }
 
+const fetchNodeData = async node => {
+    if(node.childrens && node.childrens.length > 0) {
+        let promises = []
+        for(let i = 0; i < node.childrens.length; i++){
+            promises.push(fetchNodeData(node.childrens[i]))
+        }
+        return Promise.all(promises)
+    }else if(node.hash){
+        node.hash = await getData(node.hash)
+    }
+    return node
+}
 const insertNodes = async (ipfsTreeHash, insertions) => {
     let tree = await getTree(ipfsTreeHash)
     const result = await handleInsertions(tree, insertions)    
