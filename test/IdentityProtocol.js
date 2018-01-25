@@ -16,7 +16,8 @@ const someIpfsHash = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG"
 const anotherIpfsHash = "QmWHyrPWQnsz1wxHR219ooJDYTvxJPyZuDUPSDpdsAovN5"
 // Contracts
 let protocol = null
-let identity = null
+let personalIdentity = null
+let companyIdentity = null
 
 contract('IdentityProtocol', async accounts => {
 
@@ -29,6 +30,7 @@ contract('IdentityProtocol', async accounts => {
     })
 
     context('Manage identities', () => {
+        
         it("should create an identity", async () => {
             const {logs} = await protocol.createIdentity(
                 someIpfsHash,

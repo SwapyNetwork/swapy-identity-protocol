@@ -6,30 +6,36 @@ contract IdentityProtocol {
 
     mapping(address => mapping(address => uint)) identities;
 
-    event IdentityCreated(address creator, address identity);
-    event ForwardedTo(address identity, address owner, address destination, uint256 value, bytes data);
+    event IdentityCreated(address creator, address identity, Identity.Type identityType);
+    event ForwardedTo(address identity, address owner, address destination, uint256 txValue, uint256 value, bytes data);
 
     modifier onlyIdentityOwner(address _identity) {
         require(isIdentityOwner(_identity, msg.sender));
         _;
     }
 
-    function createIdentity(bytes _identityData)
+    function createIdentity(bytes _identityData, Identity.Type _type)
         public 
         returns(bool)
     {
-        Identity identity = new Identity(_identityData);
+        Identity identity = new Identity(_identityData, _type);
         identities[identity][msg.sender] = 1;
-        IdentityCreated(msg.sender, identity);
+        IdentityCreated(msg.sender, identity, _type);
         return true;
     }
 
-    function forwardTo(Identity _identity, address _to, uint256 _value, bytes _data) 
+    function forwardTo(Identity _identity, address _to, uint256 _value, bytes _data)
+        payable
         public
         onlyIdentityOwner(_identity)
     {
-        _identity.forward(_to,_value,_data);
-        ForwardedTo(_identity, msg.sender, _to, _value, _data);
+        if (msg.value != uint256(0)) {
+            require(_identity.identityType() == Identity.Type.PERSONAL);
+            _identity.forward.value(msg.value)(_to,_value,_data);
+        } else {
+            _identity.forward(_to,_value,_data);
+        }
+        ForwardedTo(_identity, msg.sender, _to, msg.value, _value, _data);
     }
 
     function setIdentityData(Identity _identity, bytes _data) 
