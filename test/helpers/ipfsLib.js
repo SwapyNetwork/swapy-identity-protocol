@@ -49,10 +49,7 @@ const dfs = async (ipfsTreeHash, search) => {
 
 const insertNodes = async (ipfsTreeHash, insertions) => {
     let tree = await getTree(ipfsTreeHash)
-    console.log('olar')
     const algo = await handleInsertions(tree, insertions)    
-    console.log('hi')
-    console.log(algo)
     const treeHash = await saveTree(tree)
     return treeHash
 }
