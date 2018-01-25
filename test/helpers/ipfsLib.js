@@ -44,36 +44,43 @@ const getData = ipfsHash => {
 
 const dfs = async (ipfsTreeHash, search) => {
     const tree = await getTree(ipfsTreeHash)
-    console.log(tree)
     return treeLib.dfs(tree, search)
 }
 
 const insertNodes = async (ipfsTreeHash, insertions) => {
     let tree = await getTree(ipfsTreeHash)
-    tree = await handleInsertions(tree, insertions)    
+    console.log('olar')
+    const algo = await handleInsertions(tree, insertions)    
+    console.log('hi')
+    console.log(algo)
     const treeHash = await saveTree(tree)
     return treeHash
 }
 
 const handleInsertions = async (tree, insertions, parentLabel = null) => {
+    let promises = []
     for(let i=0; i < insertions.length; i++){
-        let insertion = insertions[i]
-        parentLabel = parentLabel ? parentLabel : insertion.parentLabel
-        let data = null
-        let childrens = null
-        if(!(insertion.childrens && insertion.childrens.length > 0)){
-            if(insertion.data) {
-                data = insertion.data
-            }  
-            childrens = null            
-        }
-        if(data) data = await saveData(data)
-        treeLib.insertNode(tree, parentLabel, insertion.label, data)
-        if(insertion.childrens && insertion.childrens.length > 0)
-            return handleInsertions(tree, insertion.childrens, insertion.label)
+        promises.push(handleInsertion(tree, insertions[i], parentLabel).then(data => tree))
     }
-    return tree
+    return Promise.all(promises)
 } 
+
+const handleInsertion = async (tree, insertion, parentLabel) => {
+    parentLabel = parentLabel ? parentLabel : insertion.parentLabel
+    let data = null
+    let childrens = null
+    if(!(insertion.childrens && insertion.childrens.length > 0)){
+        if(insertion.data) {
+            data = insertion.data
+        }  
+        childrens = null            
+    }
+    if(data) data = await saveData(data)
+    treeLib.insertNode(tree, parentLabel, insertion.label, data)
+    if(insertion.childrens && insertion.childrens.length > 0)
+        return await handleInsertions(tree, insertion.childrens, insertion.label)
+    return tree
+}
 
 const updateNode = async (ipfsTreeHash, search, data) => {
     const dataIpfsHash = await saveData(data)

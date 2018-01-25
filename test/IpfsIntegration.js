@@ -64,7 +64,7 @@ contract('IdentityProtocol + IPFS integration', async accounts => {
         }]
         treeHash = await ipfs.insertNodes(treeHash, insertions)
         console.log('Logging the tree Before tests...')
-        const tree = await ipfs.getTree(treeHash)
+        let tree = await ipfs.getTree(treeHash)
         console.log(JSON.stringify(tree))
         firstHash = treeHash
     })

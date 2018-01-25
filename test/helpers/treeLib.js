@@ -6,19 +6,21 @@ const initTree = () => {
 }
 
 // apply a depth-first search and insert a new node under the parentLabel
-const insertNode = (node, parentLabel, label, hash, childrens = null) => {
+const insertNode = (node, parentLabel, label, hash) => {
     if(node.label === parentLabel) {
-        let newNode = {}
-        if(childrens) newNode = { label, hash, childrens }
-        else newNode = { label, hash }
+        const newNode = { label, hash }
         if(node.childrens && node.childrens.length > 0) node.childrens.push(newNode)
-        else node.childrens = [newNode]    
-        return renewNodeHash(node)
-    } 
+        else node.childrens = [newNode]
+        node = renewNodeHash(node)
+        return node
+    }
     else if(node.childrens && node.childrens.length > 0) {
         for(let i = 0; i < node.childrens.length; i++){
-            result = insertNode(node.childrens[i], parentLabel, label, hash, childrens)
-            if(result) return renewNodeHash(node)
+            result = insertNode(node.childrens[i], parentLabel, label, hash)
+            if(result) {
+                node = renewNodeHash(node)
+                return node
+            }
         }
     }
     return null  
