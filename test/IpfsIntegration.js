@@ -27,45 +27,40 @@ contract('IdentityProtocol + IPFS integration', async accounts => {
         ipfs.setProvider('ipfs.infura.io', '5001', 'https') 
         // create the root object
         let treeHash = await ipfs.initTree()
-        // insert some nodes for test
-        // const insertions = [{
-        //     parentLabel: 'root',
-        //     label: 'root_profile',
-        //     childrens:[{
-        //         label: 'profile_name',
-        //         data: 'Any User'
-        //     },{
-        //         label: 'profile_email',
-        //         data: 'any@email.com'
-        //     },{
-        //         label: 'profile_phone',
-        //         data: '1122224444'
-        //     },{
-        //         label: 'profile_id',
-        //         data: '123123123'
-        //     }]
-        // },{
-        //     parentLabel: 'root',
-        //     label: 'root_financial',
-        //     childrens: [{
-        //         label: 'financial_loan_requests',
-        //         data: '3'
-        //     },
-        //     {
-        //         label: 'financial_investments',
-        //         childrens: [{
-        //             label: 'investments_2014',
-        //             data: '2'
-        //         },{
-        //             label: 'investments_2015',
-        //             data: '8'
-        //         }]
-        //     }]
-        // }]
+        //insert some nodes for test
         const insertions = [{
             parentLabel: 'root',
             label: 'root_profile',
-            data: 'oi'
+            childrens:[{
+                label: 'profile_name',
+                data: 'Any User'
+            },{
+                label: 'profile_email',
+                data: 'any@email.com'
+            },{
+                label: 'profile_phone',
+                data: '1122224444'
+            },{
+                label: 'profile_id',
+                data: '123123123'
+            }]
+        },{
+            parentLabel: 'root',
+            label: 'root_financial',
+            childrens: [{
+                label: 'financial_loan_requests',
+                data: '3'
+            },
+            {
+                label: 'financial_investments',
+                childrens: [{
+                    label: 'investments_2014',
+                    data: '2'
+                },{
+                    label: 'investments_2015',
+                    data: '8'
+                }]
+            }]
         }]
         treeHash = await ipfs.insertNodes(treeHash, insertions)
         console.log('Logging the tree Before tests...')

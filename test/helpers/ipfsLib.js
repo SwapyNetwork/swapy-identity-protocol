@@ -49,14 +49,15 @@ const dfs = async (ipfsTreeHash, search) => {
 }
 
 const insertNodes = async (ipfsTreeHash, insertions) => {
-    const tree = await getTree(ipfsTreeHash)
-    await handleInsertions(tree, insertions)    
+    let tree = await getTree(ipfsTreeHash)
+    tree = await handleInsertions(tree, insertions)    
     const treeHash = await saveTree(tree)
     return treeHash
 }
 
 const handleInsertions = async (tree, insertions, parentLabel = null) => {
-    await insertions.forEach(async  insertion => {
+    for(let i=0; i < insertions.length; i++){
+        let insertion = insertions[i]
         parentLabel = parentLabel ? parentLabel : insertion.parentLabel
         let data = null
         let childrens = null
@@ -69,9 +70,9 @@ const handleInsertions = async (tree, insertions, parentLabel = null) => {
         if(data) data = await saveData(data)
         treeLib.insertNode(tree, parentLabel, insertion.label, data)
         if(insertion.childrens && insertion.childrens.length > 0)
-            await handleInsertions(tree, insertion.childrens, insertion.label)
-        return tree
-    })
+            return handleInsertions(tree, insertion.childrens, insertion.label)
+    }
+    return tree
 } 
 
 const updateNode = async (ipfsTreeHash, search, data) => {
