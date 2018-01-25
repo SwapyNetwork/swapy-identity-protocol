@@ -14,6 +14,8 @@ const Identity = artifacts.require("./identity/Identity.sol")
 // --- Test variables
 const someIpfsHash = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG"
 const anotherIpfsHash = "QmWHyrPWQnsz1wxHR219ooJDYTvxJPyZuDUPSDpdsAovN5"
+const PERSONAL_IDENTITY = new BigNumber(0)
+const COMPANY_IDENTITY = new BigNumber(1)
 // Contracts
 let protocol = null
 let personalIdentity = null
@@ -31,9 +33,10 @@ contract('IdentityProtocol', async accounts => {
 
     context('Manage identities', () => {
         
-        it("should create an identity", async () => {
+        it("should create an personal identity", async () => {
             const {logs} = await protocol.createIdentity(
                 someIpfsHash,
+                true,
                 { from: identityOwner }
             )
             const event = logs.find(e => e.event === 'IdentityCreated')
@@ -41,16 +44,30 @@ contract('IdentityProtocol', async accounts => {
             expect(args).to.include.all.keys([
                 'creator',
                 'identity',
+                'identityType'
             ])
             assert.equal(args.creator, identityOwner, "The user must be identity's owner")
-            identity = await Identity.at(args.identity)
-            const storedIpfsData = await identity.financialData.call()
+            assert.equal(args.identityType.toNumber(), PERSONAL_IDENTITY.toNumber(), "The identity must be personal" )
+            personalIdentity = await Identity.at(args.identity)
+            const storedIpfsData = await personalIdentity.financialData.call()
             assert.equal(web3.toAscii(storedIpfsData), someIpfsHash, "The financial data must be the same was sent" )
+        })
+
+        it("should create an company identity", async () => {
+            const {logs} = await protocol.createIdentity(
+                someIpfsHash,
+                false,
+                { from: identityOwner }
+            )
+            const event = logs.find(e => e.event === 'IdentityCreated')
+            const args = event.args
+            assert.equal(args.identityType.toNumber(), COMPANY_IDENTITY.toNumber(), "The identity must be an company" )
+            companyIdentity = await Identity.at(args.identity)
         })
 
         it("should deny if try to set the financial data of another user identity", async () => {
             await protocol.setIdentityData(
-                identity.address,
+                personalIdentity.address,
                 anotherIpfsHash,
                 { from: Swapy }
             ).should.be.rejectedWith('VM Exception')
@@ -58,22 +75,23 @@ contract('IdentityProtocol', async accounts => {
 
         it("should set a new identity's financial data", async () => {
             const {logs} = await protocol.setIdentityData(
-                identity.address,
+                personalIdentity.address,
                 anotherIpfsHash,
                 { from: identityOwner }
             )
-            const storedIpfsData = await identity.financialData.call()
+            const storedIpfsData = await personalIdentity.financialData.call()
             assert.equal(web3.toAscii(storedIpfsData), anotherIpfsHash, "The financial data must be changed according to the value sent")
         })
+      
 
     })
 
     context("Forward transactions", () => {
         
         it("should deny if try to forward transaction by using another user identity", async () => {
-            const transactionData = signer.txutils._encodeFunctionTxData('createIdentity', ['bytes'], [someIpfsHash]);
+            const transactionData = signer.txutils._encodeFunctionTxData('createIdentity', ['bytes', 'bool'], [someIpfsHash, true]);
             await protocol.forwardTo(
-                identity.address,
+                personalIdentity.address,
                 protocol.address,
                 0,
                 `0x${transactionData}`,
@@ -82,9 +100,9 @@ contract('IdentityProtocol', async accounts => {
         })
 
         it("should forward transactions by proxy", async () => {
-            const transactionData = signer.txutils._encodeFunctionTxData('createIdentity', ['bytes'], [someIpfsHash]);
+            const transactionData = signer.txutils._encodeFunctionTxData('createIdentity', ['bytes', 'bool'], [someIpfsHash, true]);
             const {logs} = await protocol.forwardTo(
-                identity.address,
+                personalIdentity.address,
                 protocol.address,
                 0,
                 `0x${transactionData}`,
@@ -92,7 +110,7 @@ contract('IdentityProtocol', async accounts => {
             )
             const event = logs.find(e => e.event === 'IdentityCreated')
             const args = event.args
-            assert.equal(args.creator, identity.address, "The identity must be the owner of new identity" )
+            assert.equal(args.creator, personalIdentity.address, "The identity must be the owner of new identity" )
         })
 
     })

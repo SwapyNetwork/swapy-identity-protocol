@@ -11,11 +11,16 @@ const expect = require('chai').expect
 // --- Handled contracts
 const IdentityProtocol = artifacts.require("./IdentityProtocol.sol")
 const Identity = artifacts.require("./identity/Identity.sol")
+
+const PERSONAL_IDENTITY = new BigNumber(0)
+const COMPANY_IDENTITY = new BigNumber(1)
 // Contracts
 let protocol = null
 let identity = null
 
 let firstHash = null
+
+
 contract('IdentityProtocol + IPFS integration', async accounts => {
 
     before( async () => {
@@ -74,6 +79,7 @@ contract('IdentityProtocol + IPFS integration', async accounts => {
         it("Create an identity with the persisted tree's hash", async () => {
             const {logs} = await protocol.createIdentity(
                 firstHash,
+                true,
                 { from: identityOwner }
             )
             const event = logs.find(e => e.event === 'IdentityCreated')

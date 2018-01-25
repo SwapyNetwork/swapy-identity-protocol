@@ -26,14 +26,14 @@ contract Identity {
     }
 
     function forward(address to, uint256 value, bytes data) 
-        payable 
+        payable
         onlyOwner
         public
     {
         if (msg.value != uint256(0)) {
             value = msg.value;    
         }
-        require(to.call.value(msg.value)(data));
+        require(to.call.value(value)(data));
     }
 
     function setFinancialData(bytes _financialData)

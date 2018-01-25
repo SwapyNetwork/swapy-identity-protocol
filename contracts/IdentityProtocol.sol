@@ -7,17 +7,18 @@ contract IdentityProtocol {
     mapping(address => mapping(address => uint)) identities;
 
     event IdentityCreated(address creator, address identity, Identity.Type identityType);
-    event ForwardedTo(address identity, address owner, address destination, uint256 txValue, uint256 value, bytes data);
+    event ForwardedTo(address identity, address owner, address destination, uint256 value, bytes data);
 
     modifier onlyIdentityOwner(address _identity) {
         require(isIdentityOwner(_identity, msg.sender));
         _;
     }
 
-    function createIdentity(bytes _identityData, Identity.Type _type)
+    function createIdentity(bytes _identityData, bool isPersonal)
         public 
         returns(bool)
     {
+        Identity.Type _type = isPersonal ? Identity.Type.PERSONAL : Identity.Type.COMPANY;  
         Identity identity = new Identity(_identityData, _type);
         identities[identity][msg.sender] = 1;
         IdentityCreated(msg.sender, identity, _type);
@@ -35,7 +36,7 @@ contract IdentityProtocol {
         } else {
             _identity.forward(_to,_value,_data);
         }
-        ForwardedTo(_identity, msg.sender, _to, msg.value, _value, _data);
+        ForwardedTo(_identity, msg.sender, _to, _value, _data);
     }
 
     function setIdentityData(Identity _identity, bytes _data) 
