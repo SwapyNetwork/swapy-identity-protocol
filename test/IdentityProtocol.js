@@ -100,7 +100,7 @@ contract('IdentityProtocol', async accounts => {
         })
 
         it("should forward transactions by proxy", async () => {
-            const transactionData = signer.txutils._encodeFunctionTxData('createIdentity', ['bytes', 'bool'], [someIpfsHash, true]);
+            const transactionData = signer.txutils._encodeFunctionTxData('createIdentity', ['bytes', 'bool'], [someIpfsHash, false]);
             const {logs} = await protocol.forwardTo(
                 personalIdentity.address,
                 protocol.address,
