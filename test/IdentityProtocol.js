@@ -1,12 +1,12 @@
 
 const BigNumber = web3.BigNumber
-const signer = require('eth-signer')
-const should = require('chai')
-    .use(require('chai-as-promised'))
+const signer = require("eth-signer")
+const should = require("chai")
+    .use(require("chai-as-promised"))
     .should()
-const expect = require('chai').expect
+const expect = require("chai").expect
 
-const ether = require('./helpers/ether')
+const ether = require("./helpers/ether")
 
 // --- Handled contracts
 const IdentityProtocol = artifacts.require("./IdentityProtocol.sol")
@@ -21,7 +21,7 @@ let protocol = null
 let personalIdentity = null
 let companyIdentity = null
 
-contract('IdentityProtocol', async accounts => {
+contract("IdentityProtocol", async accounts => {
 
     before( async () => {
 
@@ -39,12 +39,12 @@ contract('IdentityProtocol', async accounts => {
                 true,
                 { from: identityOwner }
             )
-            const event = logs.find(e => e.event === 'IdentityCreated')
+            const event = logs.find(e => e.event === "IdentityCreated")
             const args = event.args
             expect(args).to.include.all.keys([
-                'creator',
-                'identity',
-                'identityType'
+                "creator",
+                "identity",
+                "identityType"
             ])
             assert.equal(args.creator, identityOwner, "The user must be identity's owner")
             assert.equal(args.identityType.toNumber(), PERSONAL_IDENTITY.toNumber(), "The identity must be personal" )
@@ -59,7 +59,7 @@ contract('IdentityProtocol', async accounts => {
                 false,
                 { from: identityOwner }
             )
-            const event = logs.find(e => e.event === 'IdentityCreated')
+            const event = logs.find(e => e.event === "IdentityCreated")
             const args = event.args
             assert.equal(args.identityType.toNumber(), COMPANY_IDENTITY.toNumber(), "The identity must be an company" )
             companyIdentity = await Identity.at(args.identity)
@@ -70,7 +70,7 @@ contract('IdentityProtocol', async accounts => {
                 personalIdentity.address,
                 anotherIpfsHash,
                 { from: Swapy }
-            ).should.be.rejectedWith('VM Exception')
+            ).should.be.rejectedWith("VM Exception")
         })
 
         it("should set a new identity's financial data", async () => {
@@ -89,18 +89,18 @@ contract('IdentityProtocol', async accounts => {
     context("Forward transactions", () => {
         
         it("should deny if try to forward transaction by using another user identity", async () => {
-            const transactionData = signer.txutils._encodeFunctionTxData('createIdentity', ['bytes', 'bool'], [someIpfsHash, true]);
+            const transactionData = signer.txutils._encodeFunctionTxData("createIdentity", ["bytes", "bool"], [someIpfsHash, true]);
             await protocol.forwardTo(
                 personalIdentity.address,
                 protocol.address,
                 0,
                 `0x${transactionData}`,
                 { from: Swapy }
-            ).should.be.rejectedWith('VM Exception')
+            ).should.be.rejectedWith("VM Exception")
         })
 
         it("should forward transactions by proxy", async () => {
-            const transactionData = signer.txutils._encodeFunctionTxData('createIdentity', ['bytes', 'bool'], [someIpfsHash, false]);
+            const transactionData = signer.txutils._encodeFunctionTxData("createIdentity", ["bytes", "bool"], [someIpfsHash, false]);
             const {logs} = await protocol.forwardTo(
                 personalIdentity.address,
                 protocol.address,
@@ -108,7 +108,7 @@ contract('IdentityProtocol', async accounts => {
                 `0x${transactionData}`,
                 { from: identityOwner }
             )
-            const event = logs.find(e => e.event === 'IdentityCreated')
+            const event = logs.find(e => e.event === "IdentityCreated")
             const args = event.args
             assert.equal(args.creator, personalIdentity.address, "The identity must be the owner of new identity" )
         })
