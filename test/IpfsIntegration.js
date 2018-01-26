@@ -93,8 +93,6 @@ contract('IdentityProtocol + IPFS integration', async accounts => {
             storedIpfsData = web3.toAscii(storedIpfsData)
             // search the node 'root_profile'
             const node = await ipfs.dfs(storedIpfsData, 'root_profile', false)
-            console.log("Retrieving 'root_profile' ...")
-            console.log(node)
         })
 
         it("should update a node", async () => {
@@ -108,7 +106,6 @@ contract('IdentityProtocol + IPFS integration', async accounts => {
                 ipfsHash,
                 { from: identityOwner }
             )
-            console.log("Changing 'profile_name' from Any User to Some User...")
         })
 
         it("should remove a node", async () => {
@@ -123,7 +120,6 @@ contract('IdentityProtocol + IPFS integration', async accounts => {
                 ipfsHash,
                 { from: identityOwner }
             )
-            console.log("Removing 'root_financial'...")
         })
 
 
