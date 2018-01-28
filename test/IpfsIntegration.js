@@ -77,9 +77,8 @@ contract("IdentityProtocol + IPFS integration", async accounts => {
     context("Manage identities + IPFS data", () => {
 
         it("Create an identity with the persisted tree's hash", async () => {
-            const {logs} = await protocol.createIdentity(
+            const {logs} = await protocol.createPersonalIdentity(
                 firstHash,
-                true,
                 { from: identityOwner }
             )
             const event = logs.find(e => e.event === "IdentityCreated")
@@ -101,8 +100,7 @@ contract("IdentityProtocol + IPFS integration", async accounts => {
             storedIpfsData = web3.toAscii(storedIpfsData)
             // update the node 'profile_name' and get the new tree's hash
             const ipfsHash = await ipfs.updateNode(storedIpfsData, "profile_name", "Some User")
-            await protocol.setIdentityData(
-                identity.address,
+            await identity.setFinancialData(
                 ipfsHash,
                 { from: identityOwner }
             )
@@ -115,8 +113,7 @@ contract("IdentityProtocol + IPFS integration", async accounts => {
             // update the node 'root_financial' and get the new tree's hash
             const ipfsHash = await ipfs.removeNode(storedIpfsData, "root_financial")
             // update the identity data into the blockchain 
-            await protocol.setIdentityData(
-                identity.address,
+            await identity.setFinancialData(
                 ipfsHash,
                 { from: identityOwner }
             )

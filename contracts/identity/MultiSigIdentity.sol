@@ -1,12 +1,11 @@
 pragma solidity ^0.4.18;
 
-import './Identity.sol';
+contract MultiSigIdentity {
 
-contract MultiSigIdentity is Identity {
-
-    uint required;
+    bytes public financialData;
+    uint public required;
     mapping(address=>bool) owners;
-    Transaction[] transactions;
+    Transaction[] public transactions;
 
     struct Transaction {
         bool active;
@@ -57,10 +56,10 @@ contract MultiSigIdentity is Identity {
         _;
     }
 
-    function MultiSigIdentity (bytes _financialData, address[] _owners, uint _required) 
-        Identity(_financialData, Type.COMPANY) 
+    function MultiSigIdentity (bytes _financialData, address[] _owners, uint _required)
         public 
     {
+        financialData = _financialData;
         setOwners(_owners);
         setRequired(_required);
     }
@@ -109,6 +108,16 @@ contract MultiSigIdentity is Identity {
     {
         require(_required >= 0);
         required = _required;
+    }
+
+    
+    function setFinancialData(bytes _financialData)
+        onlyWallet
+        public
+        returns(bool)
+    {
+        financialData = _financialData;
+        return true;
     }
     
     function addTransaction(address to, uint256 value, bytes data) 

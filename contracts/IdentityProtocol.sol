@@ -11,7 +11,7 @@ contract IdentityProtocol {
 
     enum Type {
         PERSONAL,
-        COMPANY
+        MULTISIG
     }
 
     function createPersonalIdentity(bytes _identityData)
@@ -30,7 +30,7 @@ contract IdentityProtocol {
     {
         MultiSigIdentity identity = new MultiSigIdentity(_identityData, _owners, _required);
         identities[identity][msg.sender] = 1;
-        IdentityCreated(msg.sender, identity, Type.COMPANY);
+        IdentityCreated(msg.sender, identity, Type.MULTISIG);
         return true;
     }
 
