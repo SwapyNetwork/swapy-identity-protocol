@@ -25,12 +25,12 @@ contract MultiSigIdentity is Identity {
     }
 
     modifier onlyNewOwner(address owner){
-        require(!(isOwner(owner)));
+        require(!isOwner(owner));
         _;
     }
 
     modifier onlyOwner(){
-        require(!(isOwner(msg.sender)));
+        require(isOwner(msg.sender));
         _;
     }
 

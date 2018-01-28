@@ -39,7 +39,7 @@ contract Identity {
     function setFinancialData(bytes _financialData)
         onlyOwner
         public
-    {   
+    {
         financialData = _financialData;
     }
 
