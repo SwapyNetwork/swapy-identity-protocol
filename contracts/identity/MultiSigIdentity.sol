@@ -15,6 +15,9 @@ contract MultiSigIdentity is Identity {
         uint256 value;
         address creator;
         uint signCount;
+        mapping(address => bool) signers;
+        bool active;
+        bool executed;
     }
 
     modifier onlyWallet() {
@@ -27,8 +30,23 @@ contract MultiSigIdentity is Identity {
         _;
     }
 
+    modifier onlyOwner(){
+        require(!(isOwner(msg.sender)));
+        _;
+    }
+
     modifier onlySigned(uint transactionId) {
         require(transactions[transactionId].signCount >= required);
+        _;
+    }
+
+    modifier notExecuted(uint transactionId) {
+        require(!transactions[transactionId].executed);
+        _;
+    } 
+
+    modifier validTransaction(uint transactionId) {
+        require(transactions[transactionId].active);
         _;
     }
 
@@ -87,8 +105,30 @@ contract MultiSigIdentity is Identity {
     }
     
     function addTransaction(address to, uint256 value, bytes data) {}
-    function signTransaction(uint transactionId) onlySigned(transactionId) {}
-    function executeTransaction(uint transactionId) onlySigned(transactionId) {}
+    
+    function signTransaction(uint transactionId) 
+        onlyOwner
+        validTransaction(transactionId) 
+        public
+        returns(bool)
+    {
+        require(!checkSign(transactionId, msg.sender));
+        transactions[transactionId].signCount++;
+        transactions[transactionId].signers[msg.sender] = true;
+        return true;
+    }
+
+    function executeTransaction(uint transactionId) 
+        onlySigned(transactionId)
+        notExecuted(transactionId)
+        public 
+        returns(bool)
+    {
+        Transaction memory transaction = transactions[transactionId];
+        require(transaction.to.call.value(transaction.value)(transaction.data));
+        transactions[transactionId].executed = true;
+        return true;
+    }
 
     function isOwner(address _owner) 
         view 
@@ -96,5 +136,13 @@ contract MultiSigIdentity is Identity {
         returns(bool)
     {
         return owners[_owner];
+    }
+
+    function checkSign(uint transactionId, address signer)
+        view
+        internal
+        returns(bool)
+    {
+        return transactions[transactionId].signers[signer];
     }
 }
