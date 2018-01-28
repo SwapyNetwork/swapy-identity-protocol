@@ -61,7 +61,16 @@ contract MultiSigIdentity is Identity {
         return true;
     }
 
-    function removeOwner(address oldOwner) onlyWallet {}
+    function removeOwner(address oldOwner) 
+        onlyWallet
+        public
+        returns(bool)
+    {
+        require(isOwner(oldOwner));
+        owners[oldOwner] = false;
+        return true;
+    }
+
     function setRequired(uint _required) onlyWallet {}
     
     function addTransaction(address to, uint256 value, bytes data) {}
