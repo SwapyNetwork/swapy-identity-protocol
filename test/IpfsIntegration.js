@@ -14,6 +14,9 @@ const Identity = artifacts.require('./identity/Identity.sol')
 
 const PERSONAL_IDENTITY = new BigNumber(0)
 const COMPANY_IDENTITY = new BigNumber(1)
+
+let Swapy = null;
+let identityOwner = null;
 // Contracts
 let protocol = null
 let identity = null
@@ -26,7 +29,7 @@ contract("IdentityProtocol + IPFS integration", async accounts => {
     before( async () => {
 
         Swapy = accounts[0]
-        identityOwner = accounts[2]
+        identityOwner = accounts[1]
         protocol = await IdentityProtocol.new({ from: Swapy })
         // Config ipfs provider
         ipfs.setProvider("ipfs.infura.io", "5001", "https") 

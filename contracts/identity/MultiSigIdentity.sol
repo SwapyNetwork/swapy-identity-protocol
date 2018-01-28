@@ -103,14 +103,6 @@ contract MultiSigIdentity {
         return true;
     }
 
-    function setRequired(uint _required)
-        internal
-    {
-        require(_required >= 0);
-        required = _required;
-    }
-
-    
     function setFinancialData(bytes _financialData)
         onlyWallet
         public
@@ -119,6 +111,14 @@ contract MultiSigIdentity {
         financialData = _financialData;
         return true;
     }
+    
+    function setRequired(uint _required)
+        internal
+    {
+        require(_required >= 0);
+        required = _required;
+    }
+
     
     function addTransaction(address to, uint256 value, bytes data) 
         onlyOwner

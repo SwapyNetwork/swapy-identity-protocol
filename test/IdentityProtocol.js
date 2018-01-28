@@ -17,12 +17,15 @@ const MULTISIG_IDENTITY = new BigNumber(1)
 // Contracts
 let protocol = null
 
+let Swapy = null;
+let identityOwner = null;
+
 contract("IdentityProtocol", async accounts => {
 
     before( async () => {
 
         Swapy = accounts[0]
-        identityOwner = accounts[2]
+        identityOwner = accounts[1]
         protocol = await IdentityProtocol.new({ from: Swapy })
 
     })
