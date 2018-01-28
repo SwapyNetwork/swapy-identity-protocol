@@ -5,9 +5,7 @@ import './Identity.sol';
 contract MultiSigIdentity is Identity {
 
     uint required;
-    address[] owners;
-    bool autoExecute;
-    
+    mapping(address=>bool) owners;
     Transaction[] transactions;
     uint256 transactionsCount;
 
@@ -24,6 +22,11 @@ contract MultiSigIdentity is Identity {
         _;
     }
 
+    modifier onlyNewOwner(address owner){
+        require(!(isOwner(owner)));
+        _;
+    }
+
     modifier onlySigned(uint transactionId) {
         require(transactions[transactionId].signCount >= required);
         _;
@@ -33,11 +36,31 @@ contract MultiSigIdentity is Identity {
         Identity(_financialData, Type.COMPANY) 
         public 
     {
-        owners = _owners;
+        setOwners(_owners);
+        require(_required >= 0);
         required = _required;
     }
 
-    function addOwner(address newOwner) onlyWallet {}
+    function setOwners(address[] _owners)
+        internal
+    {
+        for (uint i = 0; i < _owners.length; i++) {
+            if (!isOwner(_owners[i])) {
+                owners[_owners[i]] = true;
+            }
+        }
+    }
+
+    function addOwner(address newOwner)
+        onlyWallet
+        onlyNewOwner(newOwner)
+        public 
+        returns(bool)
+    {
+        owners[newOwner] = true;
+        return true;
+    }
+
     function removeOwner(address oldOwner) onlyWallet {}
     function setRequired(uint _required) onlyWallet {}
     
@@ -45,4 +68,11 @@ contract MultiSigIdentity is Identity {
     function signTransaction(uint transactionId) onlySigned(transactionId) {}
     function executeTransaction(uint transactionId) onlySigned(transactionId) {}
 
+    function isOwner(address _owner) 
+        view 
+        internal
+        returns(bool)
+    {
+        return owners[_owner];
+    }
 }
