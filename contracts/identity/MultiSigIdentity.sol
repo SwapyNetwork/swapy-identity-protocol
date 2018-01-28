@@ -7,16 +7,15 @@ contract MultiSigIdentity is Identity {
     uint required;
     mapping(address=>bool) owners;
     Transaction[] transactions;
-    uint256 transactionsCount;
 
     struct Transaction {
+        bool active;
         address to;
-        bytes data;
         uint256 value;
+        bytes data;
         address creator;
         uint signCount;
         mapping(address => bool) signers;
-        bool active;
         bool executed;
     }
 
@@ -45,7 +44,15 @@ contract MultiSigIdentity is Identity {
         _;
     } 
 
-    modifier validTransaction(uint transactionId) {
+    modifier validTransaction(address to, uint256 value, bytes data) {
+        require(to != address(0));
+        if (to == address(this)) {
+            require(value == 0);
+        }
+        _;
+    }
+
+    modifier activeTransaction(uint transactionId) {
         require(transactions[transactionId].active);
         _;
     }
@@ -104,11 +111,20 @@ contract MultiSigIdentity is Identity {
         required = _required;
     }
     
-    function addTransaction(address to, uint256 value, bytes data) {}
+    function addTransaction(address to, uint256 value, bytes data) 
+        onlyOwner
+        validTransaction(to, value, data)
+        public
+        returns(bool)
+    {
+        Transaction memory transaction = Transaction(true,to,value,data,msg.sender,0,false);
+        transactions.push(transaction);
+        return true;
+    }
     
     function signTransaction(uint transactionId) 
         onlyOwner
-        validTransaction(transactionId) 
+        activeTransaction(transactionId) 
         public
         returns(bool)
     {
