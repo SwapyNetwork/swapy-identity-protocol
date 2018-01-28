@@ -37,8 +37,7 @@ contract MultiSigIdentity is Identity {
         public 
     {
         setOwners(_owners);
-        require(_required >= 0);
-        required = _required;
+        setRequired(_required);
     }
 
     function setOwners(address[] _owners)
@@ -71,7 +70,21 @@ contract MultiSigIdentity is Identity {
         return true;
     }
 
-    function setRequired(uint _required) onlyWallet {}
+    function changeRequired(uint _required) 
+        onlyWallet 
+        public
+        returns(bool)
+    {
+        setRequired(_required);
+        return true;
+    }
+
+    function setRequired(uint _required)
+        internal
+    {
+        require(_required >= 0);
+        required = _required;
+    }
     
     function addTransaction(address to, uint256 value, bytes data) {}
     function signTransaction(uint transactionId) onlySigned(transactionId) {}
