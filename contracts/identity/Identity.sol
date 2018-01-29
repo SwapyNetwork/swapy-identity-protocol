@@ -4,24 +4,19 @@ contract Identity {
     
     address owner;
     bytes public financialData;
-    Type public identityType;
 
-    // Identity types 
-    enum Type {
-        PERSONAL,
-        COMPANY
-    }
+    event Forwarded(address destination, uint256 value, bytes data, uint256 timestamp);
+    event ProfileChanged(bytes financialData, uint256 timestamp);
 
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
 
-    function Identity(bytes _financialData, Type _identityType) 
+    function Identity(address _owner, bytes _financialData) 
         public
     {
-        owner = msg.sender;
-        identityType = _identityType;
+        owner = _owner;
         financialData = _financialData;
     }
 
@@ -29,18 +24,20 @@ contract Identity {
         payable
         onlyOwner
         public
+        returns(bool)
     {
-        if (msg.value != uint256(0)) {
-            value = msg.value;    
-        }
         require(to.call.value(value)(data));
+        Forwarded(to, value, data, now);
+        return true;
     }
+
 
     function setFinancialData(bytes _financialData)
         onlyOwner
         public
-    {   
+    {
         financialData = _financialData;
+        ProfileChanged(financialData, now);
     }
 
     

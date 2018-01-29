@@ -1,57 +1,37 @@
 pragma solidity ^0.4.18;
 
 import './identity/Identity.sol';
+import './identity/MultiSigIdentity.sol';
 
 contract IdentityProtocol {
 
     mapping(address => mapping(address => uint)) identities;
 
-    event IdentityCreated(address creator, address identity, Identity.Type identityType);
-    event ForwardedTo(address identity, address owner, address destination, uint256 value, bytes data);
+    event IdentityCreated(address creator, address identity, Type identityType, uint256 timestamp);
 
-    modifier onlyIdentityOwner(address _identity) {
-        require(isIdentityOwner(_identity, msg.sender));
-        _;
+    enum Type {
+        PERSONAL,
+        MULTISIG
     }
 
-    function createIdentity(bytes _identityData, bool isPersonal)
+    function createPersonalIdentity(bytes _identityData)
         public 
         returns(bool)
     {
-        Identity.Type _type = isPersonal ? Identity.Type.PERSONAL : Identity.Type.COMPANY;  
-        Identity identity = new Identity(_identityData, _type);
+        Identity identity = new Identity(msg.sender, _identityData);
         identities[identity][msg.sender] = 1;
-        IdentityCreated(msg.sender, identity, _type);
+        IdentityCreated(msg.sender, identity, Type.PERSONAL, now);
         return true;
     }
 
-    function forwardTo(Identity _identity, address _to, uint256 _value, bytes _data)
-        payable
+    function createMultiSigIdentity(bytes _identityData, address[] _owners, int _required)
         public
-        onlyIdentityOwner(_identity)
-    {
-        if (msg.value != uint256(0)) {
-            require(_identity.identityType() == Identity.Type.PERSONAL);
-            _identity.forward.value(msg.value)(_to,_value,_data);
-        } else {
-            _identity.forward(_to,_value,_data);
-        }
-        ForwardedTo(_identity, msg.sender, _to, _value, _data);
-    }
-
-    function setIdentityData(Identity _identity, bytes _data) 
-        public
-        onlyIdentityOwner(_identity)
-    {
-        _identity.setFinancialData(_data);
-    }
-
-    function isIdentityOwner(address _identity, address _owner)
-        internal
-        view
         returns(bool)
     {
-        return identities[_identity][_owner] == 1; 
+        MultiSigIdentity identity = new MultiSigIdentity(_identityData, _owners, _required);
+        identities[identity][msg.sender] = 1;
+        IdentityCreated(msg.sender, identity, Type.MULTISIG, now);
+        return true;
     }
 
 }
