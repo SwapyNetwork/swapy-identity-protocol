@@ -24,7 +24,7 @@ contract IdentityProtocol {
         return true;
     }
 
-    function createMultiSigIdentity(bytes _identityData, address[] _owners, uint _required)
+    function createMultiSigIdentity(bytes _identityData, address[] _owners, int _required)
         public
         returns(bool)
     {

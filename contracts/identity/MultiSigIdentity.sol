@@ -3,20 +3,28 @@ pragma solidity ^0.4.18;
 contract MultiSigIdentity {
 
     bytes public financialData;
-    uint public required;
+    int public required;
     mapping(address=>bool) owners;
     Transaction[] public transactions;
 
     struct Transaction {
         bool active;
         address to;
-        uint256 value;
+        uint value;
         bytes data;
         address creator;
-        uint signCount;
+        int signCount;
         mapping(address => bool) signers;
         bool executed;
     }
+
+    event TransactionCreated(address indexed creator, address destination, uint256 value, bytes data, uint256 timestamp);
+    event TransactionSigned(address indexed signer, uint indexed transactionId, uint256 timestamp);
+    event TransactionExecuted(address indexed executor, uint indexed transactionId, uint256 timestamp);
+    event RequiredChanged(int required, uint256 timestamp);
+    event OwnerAdded(address owner, uint256 timestamp);
+    event OwnerRemoved(address owner, uint256 timestamp);
+    event ProfileChanged(bytes financialData, uint256 timestamp);
 
     modifier onlyWallet() {
         require(msg.sender == address(this));
@@ -56,7 +64,7 @@ contract MultiSigIdentity {
         _;
     }
 
-    function MultiSigIdentity (bytes _financialData, address[] _owners, uint _required)
+    function MultiSigIdentity (bytes _financialData, address[] _owners, int _required)
         public 
     {
         financialData = _financialData;
@@ -81,6 +89,7 @@ contract MultiSigIdentity {
         returns(bool)
     {
         owners[newOwner] = true;
+        OwnerAdded(newOwner, now);
         return true;
     }
 
@@ -91,15 +100,17 @@ contract MultiSigIdentity {
     {
         require(isOwner(oldOwner));
         owners[oldOwner] = false;
+        OwnerRemoved(oldOwner, now);
         return true;
     }
 
-    function changeRequired(uint _required) 
+    function changeRequired(int _required) 
         onlyWallet 
         public
         returns(bool)
     {
         setRequired(_required);
+        RequiredChanged(_required, now);
         return true;
     }
 
@@ -109,17 +120,17 @@ contract MultiSigIdentity {
         returns(bool)
     {
         financialData = _financialData;
+        ProfileChanged(financialData, now);
         return true;
     }
     
-    function setRequired(uint _required)
+    function setRequired(int _required)
         internal
     {
         require(_required >= 0);
         required = _required;
     }
 
-    
     function addTransaction(address to, uint256 value, bytes data) 
         onlyOwner
         validTransaction(to, value, data)
@@ -128,6 +139,7 @@ contract MultiSigIdentity {
     {
         Transaction memory transaction = Transaction(true,to,value,data,msg.sender,0,false);
         transactions.push(transaction);
+        TransactionCreated(msg.sender,to,value,data, now);
         return true;
     }
     
@@ -140,6 +152,7 @@ contract MultiSigIdentity {
         require(!checkSign(transactionId, msg.sender));
         transactions[transactionId].signCount++;
         transactions[transactionId].signers[msg.sender] = true;
+        TransactionSigned(msg.sender, transactionId, now);
         return true;
     }
 
@@ -149,9 +162,10 @@ contract MultiSigIdentity {
         public 
         returns(bool)
     {
-        Transaction memory transaction = transactions[transactionId];
+        Transaction storage transaction = transactions[transactionId];
         require(transaction.to.call.value(transaction.value)(transaction.data));
         transactions[transactionId].executed = true;
+        TransactionExecuted(msg.sender, transactionId, now);
         return true;
     }
 
