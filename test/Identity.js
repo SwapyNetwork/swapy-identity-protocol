@@ -85,7 +85,8 @@ contract("Identity", async accounts => {
             expect(args).to.include.all.keys([
                 "destination",
                 "value",
-                "data"
+                "data",
+                "timestamp"
             ])
             assert.equal(args.destination, protocol.address, "The transaction must be destinated to the address sent" )
         })

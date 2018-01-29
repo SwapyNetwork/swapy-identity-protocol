@@ -42,7 +42,8 @@ contract("IdentityProtocol", async accounts => {
             expect(args).to.include.all.keys([
                 "creator",
                 "identity",
-                "identityType"
+                "identityType",
+                "timestamp"
             ])
             assert.equal(args.creator, identityOwner, "The user must be identity's owner")
             assert.equal(args.identityType.toNumber(), PERSONAL_IDENTITY.toNumber(), "The identity must be personal" )
