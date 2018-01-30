@@ -220,8 +220,8 @@ contract("MultiSigIdentity", async accounts => {
                 .should.be.rejectedWith("VM Exception")
         })
 
-        it("should change the required number of owners", async () => {
-            const transactionData = multiSigIdentity.contract.changeRequired.getData(2);
+        it("should deny if try to set a value greater than active owners", async () => {
+            const transactionData = multiSigIdentity.contract.changeRequired.getData(10);
             await multiSigIdentity.addTransaction(
                 multiSigIdentity.address,
                 0,
@@ -231,7 +231,22 @@ contract("MultiSigIdentity", async accounts => {
             await multiSigIdentity.signTransaction(3, { from: identityOwner_1 })
             await multiSigIdentity.signTransaction(3, { from: identityOwner_2 })
             await multiSigIdentity.signTransaction(3, { from: identityOwner_3 })
-            const {logs} = await multiSigIdentity.executeTransaction(3, { from: identityOwner_1 })
+            await multiSigIdentity.executeTransaction(3, { from: identityOwner_1 })
+                .should.be.rejectedWith("VM Exception")
+        })
+
+        it("should change the required number of owners", async () => {
+            const transactionData = multiSigIdentity.contract.changeRequired.getData(2);
+            await multiSigIdentity.addTransaction(
+                multiSigIdentity.address,
+                0,
+                transactionData,
+                { from: identityOwner_1 }
+            )
+            await multiSigIdentity.signTransaction(4, { from: identityOwner_1 })
+            await multiSigIdentity.signTransaction(4, { from: identityOwner_2 })
+            await multiSigIdentity.signTransaction(4, { from: identityOwner_3 })
+            const {logs} = await multiSigIdentity.executeTransaction(4, { from: identityOwner_1 })
             const event = logs.find(e => e.event === "RequiredChanged")
             const args = event.args
             expect(args).to.include.all.keys([
@@ -252,10 +267,10 @@ contract("MultiSigIdentity", async accounts => {
                 transactionData,
                 { from: identityOwner_1 }
             )
-            await multiSigIdentity.signTransaction(4, { from: identityOwner_1 })
-            await multiSigIdentity.signTransaction(4, { from: identityOwner_2 })
-            await multiSigIdentity.signTransaction(4, { from: identityOwner_3 })
-            await multiSigIdentity.executeTransaction(4, { from: identityOwner_1 })
+            await multiSigIdentity.signTransaction(5, { from: identityOwner_1 })
+            await multiSigIdentity.signTransaction(5, { from: identityOwner_2 })
+            await multiSigIdentity.signTransaction(5, { from: identityOwner_3 })
+            await multiSigIdentity.executeTransaction(5, { from: identityOwner_1 })
                 .should.be.rejectedWith("VM Exception")
         })
 
@@ -267,10 +282,10 @@ contract("MultiSigIdentity", async accounts => {
                 transactionData,
                 { from: identityOwner_1 }
             )
-            await multiSigIdentity.signTransaction(5, { from: identityOwner_1 })
-            await multiSigIdentity.signTransaction(5, { from: identityOwner_2 })
-            await multiSigIdentity.signTransaction(5, { from: identityOwner_3 })
-            const {logs} = await multiSigIdentity.executeTransaction(5, { from: identityOwner_1 })
+            await multiSigIdentity.signTransaction(6, { from: identityOwner_1 })
+            await multiSigIdentity.signTransaction(6, { from: identityOwner_2 })
+            await multiSigIdentity.signTransaction(6, { from: identityOwner_3 })
+            const {logs} = await multiSigIdentity.executeTransaction(6, { from: identityOwner_1 })
             const event = logs.find(e => e.event === "OwnerAdded")
             const args = event.args
             expect(args).to.include.all.keys([
@@ -291,10 +306,10 @@ contract("MultiSigIdentity", async accounts => {
                 transactionData,
                 { from: identityOwner_1 }
             )
-            await multiSigIdentity.signTransaction(6, { from: identityOwner_1 })
-            await multiSigIdentity.signTransaction(6, { from: identityOwner_3 })
-            await multiSigIdentity.signTransaction(6, { from: identityOwner_4 })
-            await multiSigIdentity.executeTransaction(6, { from: identityOwner_1 })
+            await multiSigIdentity.signTransaction(7, { from: identityOwner_1 })
+            await multiSigIdentity.signTransaction(7, { from: identityOwner_3 })
+            await multiSigIdentity.signTransaction(7, { from: identityOwner_4 })
+            await multiSigIdentity.executeTransaction(7, { from: identityOwner_1 })
                 .should.be.rejectedWith("VM Exception")
         })
 
@@ -306,10 +321,10 @@ contract("MultiSigIdentity", async accounts => {
                 transactionData,
                 { from: identityOwner_1 }
             )
-            await multiSigIdentity.signTransaction(7, { from: identityOwner_1 })
-            await multiSigIdentity.signTransaction(7, { from: identityOwner_3 })
-            await multiSigIdentity.signTransaction(7, { from: identityOwner_4 })
-            const {logs} = await multiSigIdentity.executeTransaction(7, { from: identityOwner_1 })
+            await multiSigIdentity.signTransaction(8, { from: identityOwner_1 })
+            await multiSigIdentity.signTransaction(8, { from: identityOwner_3 })
+            await multiSigIdentity.signTransaction(8, { from: identityOwner_4 })
+            const {logs} = await multiSigIdentity.executeTransaction(8, { from: identityOwner_1 })
             const event = logs.find(e => e.event === "OwnerRemoved")
             const args = event.args
             expect(args).to.include.all.keys([
@@ -336,7 +351,7 @@ contract("MultiSigIdentity", async accounts => {
                 transactionData,
                 { from: identityOwner_1 }
             )
-            await multiSigIdentity.signTransaction(8, { from: identityOwner_2 })
+            await multiSigIdentity.signTransaction(9, { from: identityOwner_2 })
                 .should.be.rejectedWith("VM Exception")
         })
 
