@@ -5,6 +5,7 @@ contract MultiSigIdentity {
     bytes public financialData;
     int public required;
     mapping(address=>bool) owners;
+    int public activeOwners;
     Transaction[] public transactions;
 
     struct Transaction {
@@ -68,6 +69,7 @@ contract MultiSigIdentity {
         public 
     {
         financialData = _financialData;
+        activeOwners = 0;
         setOwners(_owners);
         setRequired(_required);
     }
@@ -78,6 +80,7 @@ contract MultiSigIdentity {
         for (uint i = 0; i < _owners.length; i++) {
             if (!isOwner(_owners[i])) {
                 owners[_owners[i]] = true;
+                activeOwners++;
             }
         }
     }
@@ -89,6 +92,7 @@ contract MultiSigIdentity {
         returns(bool)
     {
         owners[newOwner] = true;
+        activeOwners++;
         OwnerAdded(newOwner, now);
         return true;
     }
@@ -100,6 +104,7 @@ contract MultiSigIdentity {
     {
         require(isOwner(oldOwner));
         owners[oldOwner] = false;
+        activeOwners--;
         OwnerRemoved(oldOwner, now);
         return true;
     }
@@ -127,7 +132,7 @@ contract MultiSigIdentity {
     function setRequired(int _required)
         internal
     {
-        require(_required >= 0);
+        require(_required >= 0 && _required <= activeOwners);
         required = _required;
     }
 
