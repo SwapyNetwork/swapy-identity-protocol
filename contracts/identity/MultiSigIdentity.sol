@@ -8,6 +8,7 @@ contract MultiSigIdentity {
     int public activeOwners;
     Transaction[] public transactions;
 
+
     struct Transaction {
         bool active;
         address to;
@@ -19,7 +20,7 @@ contract MultiSigIdentity {
         bool executed;
     }
 
-    event TransactionCreated(address indexed creator, address destination, uint256 value, bytes data, uint256 timestamp);
+    event TransactionCreated(address indexed creator, uint transactionId, address destination, uint256 value, bytes data, uint256 timestamp);
     event TransactionSigned(address indexed signer, uint indexed transactionId, uint256 timestamp);
     event TransactionExecuted(address indexed executor, uint indexed transactionId, uint256 timestamp);
     event RequiredChanged(int required, uint256 timestamp);
@@ -144,7 +145,7 @@ contract MultiSigIdentity {
     {
         Transaction memory transaction = Transaction(true,to,value,data,msg.sender,0,false);
         transactions.push(transaction);
-        TransactionCreated(msg.sender,to,value,data, now);
+        TransactionCreated(msg.sender,transactions.length - 1,to,value,data, now);
         return true;
     }
     

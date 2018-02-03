@@ -112,6 +112,7 @@ contract("MultiSigIdentity", async accounts => {
             const args = event.args
             expect(args).to.include.all.keys([
                 "creator",
+                "transactionId",
                 "destination",
                 "value",
                 "data",
