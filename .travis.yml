@@ -11,6 +11,12 @@ cache:
   - node_modules
 notifications:
   slack:
-    secure: "GQ4Rym0ujmYNcvqY+gmpMEEVMdLsHJ6axGBsISzBmM1UTUs31pnhFheqk/Caeqt+eusyjkvvgBVJ6alVJUpcp799Lw7CVtH/CvjsMx/ZXNk06+AcK8pKMfwjBAJKshJGYTUDK8IXsOFinpPZiRsuTbEvAsHNqJ9izN5nEEMMwlI5kxBK+3cGCQixmMsc7kSU93DgkyspiUj7m8YT5JziTjNnJ4OQHwYNMRVBe9ezvK1DTk5awlyYOL2c7xu5bFd+HaWUM68wBg6H+Gs6ZHQAGZMatbAYwPDgEpZlfvHrXjjFgspNifEtykXLRXbtPDHmiPyMXiQR5WXteHAiiMwF0CyCUOS9HpK5L3SyWslqH/Rpn9KloL7iVEGjaawyPk3EL/tyR+/RRwKkbJYTiPGvQg5h7M4HpKd3iwOXAiKnbXq/OFxFfyyQDBtJ2IT3FADD8G3tzyRu/3tkmNn0AbjPHPOTZgJ3+4ToQydNbwU30rqsePMMF5/SO9OAGu2GXrJHYkw/v/o8imOBRlTHwi39aIzMENItAtvtCk7D7rS+mwypsmzqUd98Z3Dj0VhoAb+9hjOPFekqrJO2kaFoEL/cydTX2fa2orwYTAVTMTAxljvTWUCRtxlEHHWC4uLWVSNfPNcgyN0VgZ1KD2DPyj6R8XvdEMx7s5sGsjluf2rgjv8="
+    secure: GQ4Rym0ujmYNcvqY+gmpMEEVMdLsHJ6axGBsISzBmM1UTUs31pnhFheqk/Caeqt+eusyjkvvgBVJ6alVJUpcp799Lw7CVtH/CvjsMx/ZXNk06+AcK8pKMfwjBAJKshJGYTUDK8IXsOFinpPZiRsuTbEvAsHNqJ9izN5nEEMMwlI5kxBK+3cGCQixmMsc7kSU93DgkyspiUj7m8YT5JziTjNnJ4OQHwYNMRVBe9ezvK1DTk5awlyYOL2c7xu5bFd+HaWUM68wBg6H+Gs6ZHQAGZMatbAYwPDgEpZlfvHrXjjFgspNifEtykXLRXbtPDHmiPyMXiQR5WXteHAiiMwF0CyCUOS9HpK5L3SyWslqH/Rpn9KloL7iVEGjaawyPk3EL/tyR+/RRwKkbJYTiPGvQg5h7M4HpKd3iwOXAiKnbXq/OFxFfyyQDBtJ2IT3FADD8G3tzyRu/3tkmNn0AbjPHPOTZgJ3+4ToQydNbwU30rqsePMMF5/SO9OAGu2GXrJHYkw/v/o8imOBRlTHwi39aIzMENItAtvtCk7D7rS+mwypsmzqUd98Z3Dj0VhoAb+9hjOPFekqrJO2kaFoEL/cydTX2fa2orwYTAVTMTAxljvTWUCRtxlEHHWC4uLWVSNfPNcgyN0VgZ1KD2DPyj6R8XvdEMx7s5sGsjluf2rgjv8=
     template:
-    - ":hammer_and_wrench: Build <%{build_url}|#%{build_number}> %{result} in %{duration}\n :octocat: <https://www.github.com/%{repository_slug}/tree/%{branch}|%{repository_slug}@%{branch}> in PR <%{pull_request_url}|#%{pull_request_number}>\n:scroll: (<%{compare_url}|%{commit}>) - _%{commit_message}_\n:godmode: %{author}"
+    - |-
+      :hammer_and_wrench: Build <%{build_url}|#%{build_number}> %{result} in %{duration}
+      :octocat: <https://www.github.com/%{repository_slug}/tree/%{branch}|%{repository_slug}@%{branch}> in PR <%{pull_request_url}|#%{pull_request_number}>
+      :scroll: (<%{compare_url}|%{commit}>) - _%{commit_message}_
+      :godmode: %{author}
+    rooms:
+      secure: GrzFZbJ3N5/VOHkV130CtkkA9Isb0KRnjTKBJNxwxn68ASAspV7nht6QVln+5Guc5xW3Vp+ihdZzbF7rYXEbueVozdBUQnYxCMUWVFFJw4Fl1bQj1MD5TY7puU8F6fXqAXErFNAKCCNtemwq7c/tTXRISvqcKAS0kZr8P7W58Vjvtf9d3yVnJxBZdKHk1smKWw47GjRaSWxWbPOAmKWB6GOZOVugz4aIfIMX0drpRi8hdcK6uJMEyb0AyYKIQ4uesBuiMCQ+5jCT/2QRy/Wv6XEWVTpLAGmCcjCSnIGkek2b2R4dGm4Q1Waa9AG1gAcubXK8qQ1DfmYbMcEwmeli0njeUzLQFe3WtndiGG+Ar8p/1VY2AR754EdI6qJM1pXyxICZ1+m2PN6LQcvXCXl8EZCRjkx3tOB1jOYvdVMjPCnCMkI3pLBW0+evEA2BD4eMMhRfyhezMEH7IYLPaRRtvnOqZKpvfIE1k8FT6Yz+mAnryMQz6SiC9mrGcivoTZ+XXsTBk5cI3Fpa2Vq6/e+CMYcpd+hyAmoQ/iPCPPiWkRTGfjSgVVhvJE8QWOJFVDLDNc4Z6QZ/rM1+QJkCvAxjDMNmFNmR/XQjXq9OGqcAnc1cOCoRG800V9Yp36W8wjAhJuyt9NQgVsAGBP9h3D7h+ag9Bh9P3wwY5Q0WGmEBvew=
