@@ -6,7 +6,7 @@ import './identity/MultiSigIdentity.sol';
 contract IdentityProtocol {
 
     mapping(bytes => address) identities;
-    mapping(address => bytes) owners;
+    mapping(address => mapping(bytes => bool)) owners;
     mapping(bytes => bool) indexes;
 
     event IdentityCreated(address creator, address identity, Type identityType, uint256 timestamp);
@@ -46,7 +46,7 @@ contract IdentityProtocol {
     {
         identities[identityId] = identity;
         indexes[identityId] = true;
-        owners[msg.sender] = identityId;
+        owners[msg.sender][identityId] = true;
         IdentityCreated(msg.sender, identity, identityType, now);
     }
 
