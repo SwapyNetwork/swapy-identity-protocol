@@ -5,7 +5,9 @@ import './identity/MultiSigIdentity.sol';
 
 contract IdentityProtocol {
 
-    mapping(address => mapping(address => uint)) identities;
+    mapping(bytes => address) identities;
+    mapping(address => bytes) owners;
+    mapping(bytes => bool) indexes;
 
     event IdentityCreated(address creator, address identity, Type identityType, uint256 timestamp);
 
@@ -14,24 +16,38 @@ contract IdentityProtocol {
         MULTISIG
     }
 
-    function createPersonalIdentity(bytes _identityData)
+    modifier uniqueId(bytes identityId){
+        require(!indexes[identityId]);
+        _;
+    }
+
+    function createPersonalIdentity(bytes identityId, bytes _identityData)
+        uniqueId(identityId)
         public 
         returns(bool)
     {
         Identity identity = new Identity(msg.sender, _identityData);
-        identities[identity][msg.sender] = 1;
-        IdentityCreated(msg.sender, identity, Type.PERSONAL, now);
+        addIdentity(identityId, identity, Type.PERSONAL);
         return true;
     }
 
-    function createMultiSigIdentity(bytes _identityData, address[] _owners, int _required)
+    function createMultiSigIdentity(bytes identityId, bytes _identityData, address[] _owners, int _required)
+        uniqueId(identityId)
         public
         returns(bool)
     {
         MultiSigIdentity identity = new MultiSigIdentity(_identityData, _owners, _required);
-        identities[identity][msg.sender] = 1;
-        IdentityCreated(msg.sender, identity, Type.MULTISIG, now);
+        addIdentity(identityId, identity, Type.MULTISIG);
         return true;
+    }
+
+    function addIdentity(bytes identityId, address identity, Type identityType)
+        internal
+    {
+        identities[identityId] = identity;
+        indexes[identityId] = true;
+        owners[msg.sender] = identityId;
+        IdentityCreated(msg.sender, identity, identityType, now);
     }
 
 }

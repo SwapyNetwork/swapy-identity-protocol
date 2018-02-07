@@ -21,6 +21,8 @@ let identityOwner = null;
 let protocol = null
 let identity = null
 
+const someIdentityHash = "4645956063920ed5773c8e2a8f040d9e9f966bf43a4b1e070b577d035d5a0b54"
+
 let firstHash = null
 
 
@@ -81,6 +83,7 @@ contract("IdentityProtocol + IPFS integration", async accounts => {
 
         it("Create an identity with the persisted tree's hash", async () => {
             const {logs} = await protocol.createPersonalIdentity(
+                someIdentityHash,
                 firstHash,
                 { from: identityOwner }
             )
