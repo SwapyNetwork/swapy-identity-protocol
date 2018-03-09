@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 contract Identity {
     
-    address owner;
+    address public owner;
     bytes public financialData;
 
     event Forwarded(address destination, uint256 value, bytes data, uint256 timestamp);
