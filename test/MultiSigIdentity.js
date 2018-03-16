@@ -12,6 +12,7 @@ const MultiSigIdentity = artifacts.require("./identity/MultiSigIdentity.sol")
 // --- Test variables
 const someIpfsHash = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG"
 const anotherIpfsHash = "QmWHyrPWQnsz1wxHR219ooJDYTvxJPyZuDUPSDpdsAovN5"
+const someIdentityHash = "4645956063920ed5773c8e2a8f040d9e9f966bf43a4b1e070b577d035d5a0b54"
 const PERSONAL_IDENTITY = new BigNumber(0)
 const MULTISIG_IDENTITY = new BigNumber(1)
 // Contracts
@@ -35,6 +36,7 @@ contract("MultiSigIdentity", async accounts => {
         identityOwner_4 = accounts[4]
         protocol = await IdentityProtocol.new({ from: Swapy })
         const {logs} = await protocol.createMultiSigIdentity(
+            someIdentityHash,
             someIpfsHash,
             [identityOwner_1, identityOwner_2, identityOwner_3],
             2,
