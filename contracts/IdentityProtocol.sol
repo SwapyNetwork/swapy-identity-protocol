@@ -50,4 +50,13 @@ contract IdentityProtocol {
         IdentityCreated(msg.sender, identity, identityType, now);
     }
 
+    function getIdentity(bytes identityId) 
+        public
+        view
+        returns(address identity)
+    {
+        require(indexes[identityId]);
+        return identities[identityId];
+    }
+
 }
