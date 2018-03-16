@@ -156,8 +156,8 @@ contract MultiSigIdentity {
         returns(bool)
     {
         require(!checkSign(transactionId, msg.sender));
-        transactions[transactionId].signCount++;
         transactions[transactionId].signers[msg.sender] = true;
+        transactions[transactionId].signCount++;
         TransactionSigned(msg.sender, transactionId, now);
         return true;
     }
@@ -169,8 +169,8 @@ contract MultiSigIdentity {
         returns(bool)
     {
         Transaction storage transaction = transactions[transactionId];
-        require(transaction.to.call.value(transaction.value)(transaction.data));
         transactions[transactionId].executed = true;
+        require(transaction.to.call.value(transaction.value)(transaction.data));
         TransactionExecuted(msg.sender, transactionId, now);
         return true;
     }
