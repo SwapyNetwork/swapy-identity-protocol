@@ -1,11 +1,14 @@
 pragma solidity ^0.4.18;
 
-contract MultiSigIdentity {
+import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 
+contract MultiSigIdentity {
+    using SafeMath for uint256;
+    
     bytes public financialData;
-    int public required;
+    uint256 public required;
     mapping(address=>bool) owners;
-    int public activeOwners;
+    uint256 public activeOwners;
     Transaction[] public transactions;
 
 
@@ -15,7 +18,7 @@ contract MultiSigIdentity {
         uint value;
         bytes data;
         address creator;
-        int signCount;
+        uint256 signCount;
         mapping(address => bool) signers;
         bool executed;
     }
@@ -23,7 +26,7 @@ contract MultiSigIdentity {
     event TransactionCreated(address indexed creator, uint transactionId, address destination, uint256 value, bytes data, uint256 timestamp);
     event TransactionSigned(address indexed signer, uint indexed transactionId, uint256 timestamp);
     event TransactionExecuted(address indexed executor, uint indexed transactionId, uint256 timestamp);
-    event RequiredChanged(int required, uint256 timestamp);
+    event RequiredChanged(uint256 required, uint256 timestamp);
     event OwnerAdded(address owner, uint256 timestamp);
     event OwnerRemoved(address owner, uint256 timestamp);
     event ProfileChanged(bytes financialData, uint256 timestamp);
@@ -66,7 +69,7 @@ contract MultiSigIdentity {
         _;
     }
 
-    function MultiSigIdentity (bytes _financialData, address[] _owners, int _required)
+    function MultiSigIdentity (bytes _financialData, address[] _owners, uint256 _required)
         public 
     {
         financialData = _financialData;
@@ -81,7 +84,7 @@ contract MultiSigIdentity {
         for (uint i = 0; i < _owners.length; i++) {
             if (!isOwner(_owners[i])) {
                 owners[_owners[i]] = true;
-                activeOwners++;
+                activeOwners = activeOwners.add(1);
             }
         }
     }
@@ -93,7 +96,7 @@ contract MultiSigIdentity {
         returns(bool)
     {
         owners[newOwner] = true;
-        activeOwners++;
+        activeOwners = activeOwners.add(1);
         OwnerAdded(newOwner, now);
         return true;
     }
@@ -105,12 +108,12 @@ contract MultiSigIdentity {
     {
         require(isOwner(oldOwner));
         owners[oldOwner] = false;
-        activeOwners--;
+        activeOwners = activeOwners.sub(1);
         OwnerRemoved(oldOwner, now);
         return true;
     }
 
-    function changeRequired(int _required) 
+    function changeRequired(uint256 _required) 
         onlyWallet 
         public
         returns(bool)
@@ -130,7 +133,7 @@ contract MultiSigIdentity {
         return true;
     }
     
-    function setRequired(int _required)
+    function setRequired(uint256 _required)
         internal
     {
         require(_required >= 0 && _required <= activeOwners);
@@ -157,7 +160,7 @@ contract MultiSigIdentity {
     {
         require(!checkSign(transactionId, msg.sender));
         transactions[transactionId].signers[msg.sender] = true;
-        transactions[transactionId].signCount++;
+        transactions[transactionId].signCount = transactions[transactionId].signCount.add(1);
         TransactionSigned(msg.sender, transactionId, now);
         return true;
     }
