@@ -3,6 +3,7 @@ pragma solidity ^0.4.18;
 import './identity/Identity.sol';
 import './identity/MultiSigIdentity.sol';
 
+
 contract IdentityProtocol {
 
     mapping(bytes => address) identities;
@@ -31,7 +32,7 @@ contract IdentityProtocol {
         return true;
     }
 
-    function createMultiSigIdentity(bytes identityId, bytes _identityData, address[] _owners, int _required)
+    function createMultiSigIdentity(bytes identityId, bytes _identityData, address[] _owners, uint256 _required)
         uniqueId(identityId)
         public
         returns(bool)
