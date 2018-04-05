@@ -136,14 +136,14 @@ contract MultiSigIdentity {
     function setRequired(uint256 _required)
         internal
     {
-        require(_required >= 0 && _required <= activeOwners);
+        require(_required <= activeOwners && _required >= 0);
         required = _required;
     }
 
     function addTransaction(address to, uint256 value, bytes data) 
         onlyOwner
         validTransaction(to, value, data)
-        public
+        external
         returns(bool)
     {
         Transaction memory transaction = Transaction(true,to,value,data,msg.sender,0,false);
@@ -155,7 +155,7 @@ contract MultiSigIdentity {
     function signTransaction(uint transactionId) 
         onlyOwner
         activeTransaction(transactionId) 
-        public
+        external
         returns(bool)
     {
         require(!checkSign(transactionId, msg.sender));

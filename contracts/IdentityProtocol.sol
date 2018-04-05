@@ -24,7 +24,7 @@ contract IdentityProtocol {
 
     function createPersonalIdentity(bytes identityId, bytes _identityData)
         uniqueId(identityId)
-        public 
+        external 
         returns(bool)
     {
         Identity identity = new Identity(msg.sender, _identityData);
@@ -34,7 +34,7 @@ contract IdentityProtocol {
 
     function createMultiSigIdentity(bytes identityId, bytes _identityData, address[] _owners, uint256 _required)
         uniqueId(identityId)
-        public
+        external
         returns(bool)
     {
         MultiSigIdentity identity = new MultiSigIdentity(_identityData, _owners, _required);
@@ -43,7 +43,7 @@ contract IdentityProtocol {
     }
 
     function addIdentity(bytes identityId, address identity, Type identityType)
-        internal
+        private
     {
         identities[identityId] = identity;
         indexes[identityId] = true;

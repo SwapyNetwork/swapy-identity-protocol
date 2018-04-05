@@ -23,7 +23,7 @@ contract Identity {
     function forward(address to, uint256 value, bytes data) 
         payable
         onlyOwner
-        public
+        external
         returns(bool)
     {
         require(to.call.value(value)(data));
@@ -34,7 +34,7 @@ contract Identity {
 
     function setFinancialData(bytes _financialData)
         onlyOwner
-        public
+        external
     {
         financialData = _financialData;
         ProfileChanged(financialData, now);
