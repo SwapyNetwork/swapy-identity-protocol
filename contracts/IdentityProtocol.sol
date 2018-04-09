@@ -71,7 +71,7 @@ contract IdentityProtocol {
      * @dev Set a new identity on the control mappings and fire an event
      * @param identityId Identity's unique ID
      * @param identity Address of identity created
-     * @param _identityType Type of identity. Personal or multi signature
+     * @param identityType Type of identity. Personal or multi signature
      */  
     function addIdentity(bytes identityId, address identity, Type identityType)
         private
