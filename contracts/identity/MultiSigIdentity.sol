@@ -2,15 +2,25 @@ pragma solidity ^0.4.18;
 
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 
+/**
+ * @title Multi Signature Identity 
+ * @dev Defines a multi signature identity with its owners, profile data, required number of signatures and transaction as well. 
+ * Allows execute transaction as a proxy.
+ */
 contract MultiSigIdentity {
+    /**
+     * Add safety checks for uint operations
+     */
     using SafeMath for uint256;
     
+    /**
+     * Storage
+     */
     bytes public financialData;
     uint256 public required;
     mapping(address=>bool) owners;
     uint256 public activeOwners;
     Transaction[] public transactions;
-
 
     struct Transaction {
         bool active;
@@ -23,6 +33,9 @@ contract MultiSigIdentity {
         bool executed;
     }
 
+    /**
+     * Events   
+     */
     event TransactionCreated(address indexed creator, uint transactionId, address destination, uint256 value, bytes data, uint256 timestamp);
     event TransactionSigned(address indexed signer, uint indexed transactionId, uint256 timestamp);
     event TransactionExecuted(address indexed executor, uint indexed transactionId, uint256 timestamp);
@@ -31,31 +44,29 @@ contract MultiSigIdentity {
     event OwnerRemoved(address owner, uint256 timestamp);
     event ProfileChanged(bytes financialData, uint256 timestamp);
 
+    /**
+     * Modifiers   
+     */
     modifier onlyWallet() {
         require(msg.sender == address(this));
         _;
     }
-
     modifier onlyNewOwner(address owner){
         require(!isOwner(owner));
         _;
     }
-
     modifier onlyOwner(){
         require(isOwner(msg.sender));
         _;
     }
-
     modifier onlySigned(uint transactionId) {
         require(transactions[transactionId].signCount >= required);
         _;
     }
-
     modifier notExecuted(uint transactionId) {
         require(!transactions[transactionId].executed);
         _;
     } 
-
     modifier validTransaction(address to, uint256 value, bytes data) {
         require(to != address(0));
         if (to == address(this)) {
@@ -63,12 +74,16 @@ contract MultiSigIdentity {
         }
         _;
     }
-
     modifier activeTransaction(uint transactionId) {
         require(transactions[transactionId].active);
         _;
     }
-
+    
+    /**
+     * @param _financialData Profile hash
+     * @param _owners Owner addresses
+     * @param _required Required number of signatures to allow a transaction 
+     */ 
     function MultiSigIdentity (bytes _financialData, address[] _owners, uint256 _required)
         public 
     {
@@ -78,6 +93,10 @@ contract MultiSigIdentity {
         setRequired(_required);
     }
 
+    /**
+     * @dev Set multi signature owners
+     * @param _owners Owner addresses
+     */ 
     function setOwners(address[] _owners)
         internal
     {
@@ -89,6 +108,11 @@ contract MultiSigIdentity {
         }
     }
 
+    /**
+     * @dev Add a new owner. ** Only accepted by a multi signature transaction
+     * @param newOwner Address of the new owner
+     * @return Success
+     */ 
     function addOwner(address newOwner)
         onlyWallet
         onlyNewOwner(newOwner)
@@ -101,6 +125,11 @@ contract MultiSigIdentity {
         return true;
     }
 
+    /**
+     * @dev Remove an owner. ** Only accepted by a multi signature transaction
+     * @param oldOwner Address of the new owner
+     * @return Success
+     */
     function removeOwner(address oldOwner) 
         onlyWallet
         public
@@ -113,6 +142,11 @@ contract MultiSigIdentity {
         return true;
     }
 
+    /**
+     * @dev Change required number of signatures to execute a transaction. ** Only accepted by a multi signature transaction
+     * @param _required New requirement
+     * @return Success
+     */
     function changeRequired(uint256 _required) 
         onlyWallet 
         public
@@ -122,7 +156,12 @@ contract MultiSigIdentity {
         RequiredChanged(_required, now);
         return true;
     }
-
+    
+    /**
+     * @dev Change the profile data hash. ** Only accepted by a multi signature transaction
+     * @param _financialData New profile's hash
+     * @return Success
+     */
     function setFinancialData(bytes _financialData)
         onlyWallet
         public
@@ -133,6 +172,10 @@ contract MultiSigIdentity {
         return true;
     }
     
+    /**
+     * @dev Set a new required number of signatures to execute a transaction. 
+     * @param _required New requirement
+     */    
     function setRequired(uint256 _required)
         internal
     {
@@ -140,6 +183,13 @@ contract MultiSigIdentity {
         required = _required;
     }
 
+    /**
+     * @dev Create a multi signature transaction
+     * @param to Destiny of transaction
+     * @param value Transaction value
+     * @param data Encoded data of transaction.
+     * @return Success
+     */
     function addTransaction(address to, uint256 value, bytes data) 
         onlyOwner
         validTransaction(to, value, data)
@@ -152,6 +202,11 @@ contract MultiSigIdentity {
         return true;
     }
     
+    /**
+     * @dev Sign a transaction
+     * @param transactionId Id of multi signature transaction 
+     * @return Success
+     */
     function signTransaction(uint transactionId) 
         onlyOwner
         activeTransaction(transactionId) 
@@ -165,6 +220,11 @@ contract MultiSigIdentity {
         return true;
     }
 
+    /**
+     * @dev Execute a multi signature transaction if it's allowed 
+     * @param transactionId Id of multi signature transaction 
+     * @return Success
+     */
     function executeTransaction(uint transactionId) 
         onlySigned(transactionId)
         notExecuted(transactionId)
@@ -178,6 +238,11 @@ contract MultiSigIdentity {
         return true;
     }
 
+    /**
+     * @dev Checks if the address is an owner
+     * @param _owner Address to be checked 
+     * @return is Owner
+     */
     function isOwner(address _owner) 
         view 
         internal
@@ -186,6 +251,12 @@ contract MultiSigIdentity {
         return owners[_owner];
     }
 
+    /**
+     * @dev Checks if address given have signed the transaction
+     * @param transactionId Id of multi signature transaction 
+     * @param signer Address to be checked 
+     * @return have signed
+     */
     function checkSign(uint transactionId, address signer)
         view
         internal
