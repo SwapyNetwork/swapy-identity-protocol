@@ -3,25 +3,42 @@ pragma solidity ^0.4.18;
 import './identity/Identity.sol';
 import './identity/MultiSigIdentity.sol';
 
-
+/**
+ * @title Swapy Identity Protocol 
+ * @dev Allows the creation of personal and multi signature identities
+ */
 contract IdentityProtocol {
 
+    /**
+     * Storage
+     */
     mapping(bytes => address) identities;
     mapping(address => mapping(bytes => bool)) owners;
     mapping(bytes => bool) indexes;
-
-    event IdentityCreated(address creator, address identity, Type identityType, uint256 timestamp);
-
     enum Type {
         PERSONAL,
         MULTISIG
     }
+    
+    /**
+     * Events   
+     */
+    event IdentityCreated(address creator, address identity, Type identityType, uint256 timestamp);
 
+    /**
+     * Modifiers   
+     */
     modifier uniqueId(bytes identityId){
         require(!indexes[identityId]);
         _;
     }
 
+    /**
+     * @dev Create a personal identity with its ID and profile hash
+     * @param identityId Identity's unique ID
+     * @param _identityData Profile data hash
+     * @return Success
+     */    
     function createPersonalIdentity(bytes identityId, bytes _identityData)
         uniqueId(identityId)
         external 
@@ -32,6 +49,14 @@ contract IdentityProtocol {
         return true;
     }
 
+    /**
+     * @dev Create a multi signature identity with its ID, profile hash, owners and number of signatures required
+     * @param identityId Identity's unique ID
+     * @param _identityData Profile data hash
+     * @param _owners Owner addresses
+     * @param _required Number of signatures required
+     * @return Success
+     */    
     function createMultiSigIdentity(bytes identityId, bytes _identityData, address[] _owners, uint256 _required)
         uniqueId(identityId)
         external
@@ -42,6 +67,12 @@ contract IdentityProtocol {
         return true;
     }
 
+    /**
+     * @dev Set a new identity on the control mappings and fire an event
+     * @param identityId Identity's unique ID
+     * @param identity Address of identity created
+     * @param _identityType Type of identity. Personal or multi signature
+     */  
     function addIdentity(bytes identityId, address identity, Type identityType)
         private
     {
@@ -51,6 +82,11 @@ contract IdentityProtocol {
         IdentityCreated(msg.sender, identity, identityType, now);
     }
 
+    /**
+     * @dev Retrieve an identity by its ID
+     * @param identityId Identity's unique ID
+     * @return Identity's address
+     */
     function getIdentity(bytes identityId) 
         public
         view
