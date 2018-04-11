@@ -36,13 +36,13 @@ contract MultiSigIdentity {
     /**
      * Events   
      */
-    event TransactionCreated(address indexed creator, uint transactionId, address destination, uint256 value, bytes data, uint256 timestamp);
-    event TransactionSigned(address indexed signer, uint indexed transactionId, uint256 timestamp);
-    event TransactionExecuted(address indexed executor, uint indexed transactionId, uint256 timestamp);
-    event RequiredChanged(uint256 required, uint256 timestamp);
-    event OwnerAdded(address owner, uint256 timestamp);
-    event OwnerRemoved(address owner, uint256 timestamp);
-    event ProfileChanged(bytes financialData, uint256 timestamp);
+    event LogTransactionCreated(address indexed creator, uint transactionId, address destination, uint256 value, bytes data, uint256 timestamp);
+    event LogTransactionSigned(address indexed signer, uint indexed transactionId, uint256 timestamp);
+    event LogTransactionExecuted(address indexed executor, uint indexed transactionId, uint256 timestamp);
+    event LogRequiredChanged(uint256 required, uint256 timestamp);
+    event LogOwnerAdded(address owner, uint256 timestamp);
+    event LogOwnerRemoved(address owner, uint256 timestamp);
+    event LogProfileChanged(bytes financialData, uint256 timestamp);
 
     /**
      * Modifiers   
@@ -121,7 +121,7 @@ contract MultiSigIdentity {
     {
         owners[newOwner] = true;
         activeOwners = activeOwners.add(1);
-        emit OwnerAdded(newOwner, now);
+        emit LogOwnerAdded(newOwner, now);
         return true;
     }
 
@@ -138,7 +138,7 @@ contract MultiSigIdentity {
         require(isOwner(oldOwner));
         owners[oldOwner] = false;
         activeOwners = activeOwners.sub(1);
-        emit OwnerRemoved(oldOwner, now);
+        emit LogOwnerRemoved(oldOwner, now);
         return true;
     }
 
@@ -153,7 +153,7 @@ contract MultiSigIdentity {
         returns(bool)
     {
         setRequired(_required);
-        emit RequiredChanged(_required, now);
+        emit LogRequiredChanged(_required, now);
         return true;
     }
     
@@ -168,7 +168,7 @@ contract MultiSigIdentity {
         returns(bool)
     {
         financialData = _financialData;
-        emit ProfileChanged(financialData, now);
+        emit LogProfileChanged(financialData, now);
         return true;
     }
     
@@ -198,7 +198,7 @@ contract MultiSigIdentity {
     {
         Transaction memory transaction = Transaction(true,to,value,data,msg.sender,0,false);
         transactions.push(transaction);
-        emit TransactionCreated(msg.sender,transactions.length - 1,to,value,data, now);
+        emit LogTransactionCreated(msg.sender,transactions.length - 1,to,value,data, now);
         return true;
     }
     
@@ -216,7 +216,7 @@ contract MultiSigIdentity {
         require(!checkSign(transactionId, msg.sender));
         transactions[transactionId].signers[msg.sender] = true;
         transactions[transactionId].signCount = transactions[transactionId].signCount.add(1);
-        emit TransactionSigned(msg.sender, transactionId, now);
+        emit LogTransactionSigned(msg.sender, transactionId, now);
         return true;
     }
 
@@ -234,7 +234,7 @@ contract MultiSigIdentity {
         Transaction storage transaction = transactions[transactionId];
         transactions[transactionId].executed = true;
         require(transaction.to.call.value(transaction.value)(transaction.data));
-        emit TransactionExecuted(msg.sender, transactionId, now);
+        emit LogTransactionExecuted(msg.sender, transactionId, now);
         return true;
     }
 

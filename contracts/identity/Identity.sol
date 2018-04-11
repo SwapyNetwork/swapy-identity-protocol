@@ -15,8 +15,8 @@ contract Identity {
     /**
      * Events   
      */
-    event Forwarded(address destination, uint256 value, bytes data, uint256 timestamp);
-    event ProfileChanged(bytes financialData, uint256 timestamp);
+    event LogForwarded(address destination, uint256 value, bytes data, uint256 timestamp);
+    event LogProfileChanged(bytes financialData, uint256 timestamp);
 
     /**
      * Modifiers   
@@ -51,7 +51,7 @@ contract Identity {
         returns(bool)
     {
         require(to.call.value(value)(data));
-        emit Forwarded(to, value, data, now);
+        emit LogForwarded(to, value, data, now);
         return true;
     }
 
@@ -64,7 +64,7 @@ contract Identity {
         external
     {
         financialData = _financialData;
-        emit ProfileChanged(financialData, now);
+        emit LogProfileChanged(financialData, now);
     }
 
     

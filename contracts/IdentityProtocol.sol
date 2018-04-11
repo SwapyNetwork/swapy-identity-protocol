@@ -23,7 +23,7 @@ contract IdentityProtocol {
     /**
      * Events   
      */
-    event IdentityCreated(address creator, address identity, Type identityType, uint256 timestamp);
+    event LogIdentityCreated(address creator, address identity, Type identityType, uint256 timestamp);
 
     /**
      * Modifiers   
@@ -79,7 +79,7 @@ contract IdentityProtocol {
         identities[identityId] = identity;
         indexes[identityId] = true;
         owners[msg.sender][identityId] = true;
-        emit IdentityCreated(msg.sender, identity, identityType, now);
+        emit LogIdentityCreated(msg.sender, identity, identityType, now);
     }
 
     /**

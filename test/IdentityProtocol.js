@@ -47,7 +47,7 @@ contract("IdentityProtocol", async accounts => {
                 personalIdentity.ipfsHash,
                 { from: identityOwner }
             )
-            const event = logs.find(e => e.event === "IdentityCreated")
+            const event = logs.find(e => e.event === "LogIdentityCreated")
             const args = event.args
             expect(args).to.include.all.keys([
                 "creator",
@@ -77,7 +77,7 @@ contract("IdentityProtocol", async accounts => {
                 1,
                 { from: identityOwner }
             )
-            const event = logs.find(e => e.event === "IdentityCreated")
+            const event = logs.find(e => e.event === "LogIdentityCreated")
             const args = event.args
             assert.equal(args.identityType.toNumber(), MULTISIG_IDENTITY.toNumber(), "The identity must be an company" )
             multiSigIdentity.address = args.identity

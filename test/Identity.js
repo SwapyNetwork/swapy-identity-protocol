@@ -39,7 +39,7 @@ contract("Identity", async accounts => {
                 someIpfsHash,
                 { from: identityOwner }
             )
-            const event = logs.find(e => e.event === "IdentityCreated")
+            const event = logs.find(e => e.event === "LogIdentityCreated")
             const args = event.args
             personalIdentity = await Identity.at(args.identity)
         })
@@ -83,7 +83,7 @@ contract("Identity", async accounts => {
                 `0x${transactionData}`,
                 { from: identityOwner }
             )
-            const event = logs.find(e => e.event === "Forwarded")
+            const event = logs.find(e => e.event === "LogForwarded")
             const args = event.args
             expect(args).to.include.all.keys([
                 "destination",

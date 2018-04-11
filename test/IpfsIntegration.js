@@ -87,7 +87,7 @@ contract("IdentityProtocol + IPFS integration", async accounts => {
                 firstHash,
                 { from: identityOwner }
             )
-            const event = logs.find(e => e.event === "IdentityCreated")
+            const event = logs.find(e => e.event === "LogIdentityCreated")
             const args = event.args
             identity = await Identity.at(args.identity)
         })
