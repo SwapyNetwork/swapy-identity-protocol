@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 
@@ -121,7 +121,7 @@ contract MultiSigIdentity {
     {
         owners[newOwner] = true;
         activeOwners = activeOwners.add(1);
-        OwnerAdded(newOwner, now);
+        emit OwnerAdded(newOwner, now);
         return true;
     }
 
@@ -138,7 +138,7 @@ contract MultiSigIdentity {
         require(isOwner(oldOwner));
         owners[oldOwner] = false;
         activeOwners = activeOwners.sub(1);
-        OwnerRemoved(oldOwner, now);
+        emit OwnerRemoved(oldOwner, now);
         return true;
     }
 
@@ -153,7 +153,7 @@ contract MultiSigIdentity {
         returns(bool)
     {
         setRequired(_required);
-        RequiredChanged(_required, now);
+        emit RequiredChanged(_required, now);
         return true;
     }
     
@@ -168,7 +168,7 @@ contract MultiSigIdentity {
         returns(bool)
     {
         financialData = _financialData;
-        ProfileChanged(financialData, now);
+        emit ProfileChanged(financialData, now);
         return true;
     }
     
@@ -198,7 +198,7 @@ contract MultiSigIdentity {
     {
         Transaction memory transaction = Transaction(true,to,value,data,msg.sender,0,false);
         transactions.push(transaction);
-        TransactionCreated(msg.sender,transactions.length - 1,to,value,data, now);
+        emit TransactionCreated(msg.sender,transactions.length - 1,to,value,data, now);
         return true;
     }
     
@@ -216,7 +216,7 @@ contract MultiSigIdentity {
         require(!checkSign(transactionId, msg.sender));
         transactions[transactionId].signers[msg.sender] = true;
         transactions[transactionId].signCount = transactions[transactionId].signCount.add(1);
-        TransactionSigned(msg.sender, transactionId, now);
+        emit TransactionSigned(msg.sender, transactionId, now);
         return true;
     }
 
@@ -234,7 +234,7 @@ contract MultiSigIdentity {
         Transaction storage transaction = transactions[transactionId];
         transactions[transactionId].executed = true;
         require(transaction.to.call.value(transaction.value)(transaction.data));
-        TransactionExecuted(msg.sender, transactionId, now);
+        emit TransactionExecuted(msg.sender, transactionId, now);
         return true;
     }
 

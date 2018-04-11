@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 import './identity/Identity.sol';
 import './identity/MultiSigIdentity.sol';
@@ -79,7 +79,7 @@ contract IdentityProtocol {
         identities[identityId] = identity;
         indexes[identityId] = true;
         owners[msg.sender][identityId] = true;
-        IdentityCreated(msg.sender, identity, identityType, now);
+        emit IdentityCreated(msg.sender, identity, identityType, now);
     }
 
     /**

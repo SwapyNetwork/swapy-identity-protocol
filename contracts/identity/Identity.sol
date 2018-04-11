@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 /**
  * @title Identity 
@@ -51,7 +51,7 @@ contract Identity {
         returns(bool)
     {
         require(to.call.value(value)(data));
-        Forwarded(to, value, data, now);
+        emit Forwarded(to, value, data, now);
         return true;
     }
 
@@ -64,7 +64,7 @@ contract Identity {
         external
     {
         financialData = _financialData;
-        ProfileChanged(financialData, now);
+        emit ProfileChanged(financialData, now);
     }
 
     
