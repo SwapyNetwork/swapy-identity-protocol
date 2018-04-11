@@ -1,7 +1,7 @@
 pragma solidity ^0.4.21;
 
-import './identity/Identity.sol';
-import './identity/MultiSigIdentity.sol';
+import "./identity/Identity.sol";
+import "./identity/MultiSigIdentity.sol";
 
 /**
  * @title Swapy Identity Protocol 
