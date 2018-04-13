@@ -58,13 +58,16 @@ contract Identity {
     /**
      * @dev Update Identity's profile
      * @param _financialData New profile data's hash
+     * @return Success
      */
     function setFinancialData(bytes _financialData)
         onlyOwner
         external
+        returns(bool)
     {
         financialData = _financialData;
         emit LogProfileChanged(financialData, now);
+        return true;
     }
 
     
