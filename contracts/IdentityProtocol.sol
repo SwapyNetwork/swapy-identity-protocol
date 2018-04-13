@@ -37,16 +37,16 @@ contract IdentityProtocol {
      * @dev Create a personal identity with its ID and profile hash
      * @param identityId Identity's unique ID
      * @param _identityData Profile data hash
-     * @return Success
+     * @return Identity address
      */    
     function createPersonalIdentity(bytes identityId, bytes _identityData)
         uniqueId(identityId)
         external 
-        returns(bool)
+        returns(address)
     {
         Identity identity = new Identity(msg.sender, _identityData);
         addIdentity(identityId, identity, Type.PERSONAL);
-        return true;
+        return identity;
     }
 
     /**
@@ -55,16 +55,16 @@ contract IdentityProtocol {
      * @param _identityData Profile data hash
      * @param _owners Owner addresses
      * @param _required Number of signatures required
-     * @return Success
+     * @return Address
      */    
     function createMultiSigIdentity(bytes identityId, bytes _identityData, address[] _owners, uint256 _required)
         uniqueId(identityId)
         external
-        returns(bool)
+        returns(address)
     {
         MultiSigIdentity identity = new MultiSigIdentity(_identityData, _owners, _required);
         addIdentity(identityId, identity, Type.MULTISIG);
-        return true;
+        return identity;
     }
 
     /**
