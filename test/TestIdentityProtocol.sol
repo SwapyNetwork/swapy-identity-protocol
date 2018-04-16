@@ -53,8 +53,8 @@ contract TestIdentityProtocol {
 
     // Testing the createPersonalIdentity() function
     function testUserCannotGetInvalidIdentity() public {
-        throwableProtocol.getIdentity("PersonalTestInvalid");
-        throwProxy.shouldThrow(); 
+        throwableProtocol.getIdentity("InvalidIdentity");
+        throwProxy.shouldThrow();
     }
     
 }
