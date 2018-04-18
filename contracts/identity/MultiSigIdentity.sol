@@ -194,12 +194,12 @@ contract MultiSigIdentity {
         onlyOwner
         validTransaction(to, value, data)
         external
-        returns(bool)
+        returns(uint256)
     {
         Transaction memory transaction = Transaction(true,to,value,data,msg.sender,0,false);
         transactions.push(transaction);
         emit LogTransactionCreated(msg.sender,transactions.length - 1,to,value,data, now);
-        return true;
+        return transactions.length - 1;
     }
     
     /**

@@ -7,7 +7,7 @@ import "../contracts/identity/Identity.sol";
 import "./helpers/ThrowProxy.sol";
 
 contract TestIdentity {
-    
+
     Identity identity = new Identity(address(this),"QmeHy1gq8QHVchad7ndEsdAnaBWGu1CAVmYCb4aTJW2Pwa");
     ThrowProxy throwProxy = new ThrowProxy(address(identity)); 
     Identity throwableIdentity = Identity(address(throwProxy));
@@ -26,11 +26,11 @@ contract TestIdentity {
 
     // Testing setFinancialData() function
     function testOnlyOwnerCanChangeProfile() public {
-        //notAllowed.forwardSetFinancialData(address(throwProxy),"QmeHy1gq8QHVchad7ndEsdAnaBWGu1CAVmYCb4aTJW2Pwa");
         throwableIdentity.setFinancialData("QmeHy1gq8QHVchad7ndEsdAnaBWGu1CAVmYCb4aTJW2Pwa");
         throwProxy.shouldThrow(); 
     }
 
+    // Testing forward() function
     function testIdentityCanForwardTransactionByOwner() public {
         SomeContract someInstance = SomeContract(address(this));
         someInstance.someFunction();
@@ -38,6 +38,7 @@ contract TestIdentity {
         Assert.equal(result, true, "The transaction must be executed");
     }
 
+    // Testing forward() function
     function testOnlyOwnerCanUseIdentityAsProxy() public {
         SomeContract someInstance = SomeContract(address(this));
         someInstance.someFunction();
