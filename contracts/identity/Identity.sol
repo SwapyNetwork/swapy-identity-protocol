@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.23;
 
 /**
  * @title Identity 
@@ -22,7 +22,7 @@ contract Identity {
      * Modifiers   
      */
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "The user isn't identity's owner");
         _;
     }
 
@@ -30,7 +30,7 @@ contract Identity {
      * @param _owner Address of Identity's owner
      * @param _financialData Profile hash
      */   
-    function Identity(address _owner, bytes _financialData) 
+    constructor(address _owner, bytes _financialData) 
         public
     {
         owner = _owner;
@@ -50,7 +50,7 @@ contract Identity {
         external
         returns(bool)
     {
-        require(to.call.value(value)(data));
+        require(to.call.value(value)(data), "An error ocured when executing transaction");
         emit LogForwarded(to, value, data, now);
         return true;
     }

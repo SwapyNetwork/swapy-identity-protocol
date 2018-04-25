@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.23;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
@@ -11,6 +11,7 @@ contract TestIdentity {
     Identity identity = new Identity(address(this),"QmeHy1gq8QHVchad7ndEsdAnaBWGu1CAVmYCb4aTJW2Pwa");
     ThrowProxy throwProxy = new ThrowProxy(address(identity)); 
     Identity throwableIdentity = Identity(address(throwProxy));
+    SomeContract someInstance = new SomeContract();
 
     bytes msgData;
     
@@ -26,23 +27,19 @@ contract TestIdentity {
 
     // Testing setFinancialData() function
     function testOnlyOwnerCanChangeProfile() public {
-        throwableIdentity.setFinancialData("QmeHy1gq8QHVchad7ndEsdAnaBWGu1CAVmYCb4aTJW2Pwa");
+        address(throwableIdentity).call(abi.encodeWithSignature("setFinancialData(bytes)","QmeHy1gq8QHVchad7ndEsdAnaBWGu1CAVmYCb4aTJW2Pwa"));
         throwProxy.shouldThrow(); 
     }
 
     // Testing forward() function
     function testIdentityCanForwardTransactionByOwner() public {
-        SomeContract someInstance = SomeContract(address(this));
-        someInstance.someFunction();
-        bool result = identity.forward(address(someInstance), 0, msgData);
+        bool result = identity.forward(address(someInstance), 0, abi.encodeWithSignature("someFunction()"));
         Assert.equal(result, true, "The transaction must be executed");
     }
 
     // Testing forward() function
     function testOnlyOwnerCanUseIdentityAsProxy() public {
-        SomeContract someInstance = SomeContract(address(this));
-        someInstance.someFunction();
-        throwableIdentity.forward(address(someInstance), 0, msgData);
+        address(throwableIdentity).call(abi.encodeWithSignature("forward(address,uint256,bytes)",address(someInstance), 0, abi.encodeWithSignature("someFunction()")));
         throwProxy.shouldThrow();
     }   
 }

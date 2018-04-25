@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.23;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
@@ -35,12 +35,12 @@ contract TestIdentityProtocol {
 
     // Testing the createMultiSigIdentity() function
     function testUserCannotCreateIdentityWithDuplicatedId() public {
-        throwableProtocol.createMultiSigIdentity(
+        address(throwableProtocol).call(abi.encodeWithSignature("createMultiSigIdentity(bytes,bytes,address[],uint256)",
             "MultiSigTest",
             "QmeHy1gq8QHVchad7ndEsdAnaBWGu1CAVmYCb4aTJW2Pwa",
             owners,
             uint256(1)
-        );
+        ));
         throwProxy.shouldThrow();  
     }
 
@@ -53,7 +53,7 @@ contract TestIdentityProtocol {
 
     // Testing the createPersonalIdentity() function
     function testUserCannotGetInvalidIdentity() public {
-        throwableProtocol.getIdentity("InvalidIdentity");
+        address(throwableProtocol).call(abi.encodeWithSignature("getIdentity(bytes)","InvalidIdentity"));
         throwProxy.shouldThrow();
     }
     

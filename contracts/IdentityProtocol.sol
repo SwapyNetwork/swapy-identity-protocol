@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.23;
 
 import "./identity/Identity.sol";
 import "./identity/MultiSigIdentity.sol";
@@ -29,7 +29,7 @@ contract IdentityProtocol {
      * Modifiers   
      */
     modifier uniqueId(bytes identityId){
-        require(!indexes[identityId]);
+        require(!indexes[identityId], "ID already exists");
         _;
     }
 
@@ -92,7 +92,7 @@ contract IdentityProtocol {
         view
         returns(address identity)
     {
-        require(indexes[identityId]);
+        require(indexes[identityId], "The identity doesn't exists");
         return identities[identityId];
     }
 

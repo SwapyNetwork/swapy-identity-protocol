@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.23;
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -48,34 +48,34 @@ contract MultiSigIdentity {
      * Modifiers   
      */
     modifier onlyWallet() {
-        require(msg.sender == address(this));
+        require(msg.sender == address(this), "Action denied without a multi sign transaction");
         _;
     }
     modifier onlyNewOwner(address owner){
-        require(!isOwner(owner));
+        require(!isOwner(owner), "The address is an owner");
         _;
     }
     modifier onlyOwner(){
-        require(isOwner(msg.sender));
+        require(isOwner(msg.sender), "The user isn't identity's owner");
         _;
     }
     modifier onlySigned(uint transactionId) {
-        require(transactions[transactionId].signCount >= required);
+        require(transactions[transactionId].signCount >= required, "Insuficient number of signatures");
         _;
     }
     modifier notExecuted(uint transactionId) {
-        require(!transactions[transactionId].executed);
+        require(!transactions[transactionId].executed, "The transaction is already executed");
         _;
     } 
     modifier validTransaction(address to, uint256 value, bytes data) {
-        require(to != address(0));
+        require(to != address(0), "Invalid destination address");
         if (to == address(this)) {
-            require(value == 0);
+            require(value == 0, "Internal transactions should not have value");
         }
         _;
     }
     modifier activeTransaction(uint transactionId) {
-        require(transactions[transactionId].active);
+        require(transactions[transactionId].active, "The transaction is inactive");
         _;
     }
     
@@ -84,7 +84,7 @@ contract MultiSigIdentity {
      * @param _owners Owner addresses
      * @param _required Required number of signatures to allow a transaction 
      */ 
-    function MultiSigIdentity (bytes _financialData, address[] _owners, uint256 _required)
+    constructor(bytes _financialData, address[] _owners, uint256 _required)
         public 
     {
         financialData = _financialData;
@@ -135,7 +135,7 @@ contract MultiSigIdentity {
         public
         returns(bool)
     {
-        require(isOwner(oldOwner));
+        require(isOwner(oldOwner), "The address isn't identity's owner");
         owners[oldOwner] = false;
         activeOwners = activeOwners.sub(1);
         emit LogOwnerRemoved(oldOwner, now);
@@ -179,7 +179,7 @@ contract MultiSigIdentity {
     function setRequired(uint256 _required)
         internal
     {
-        require(_required <= activeOwners && _required >= 0);
+        require(_required <= activeOwners && _required >= 0, "The number of signatures must be greater than 0 and less than the number of owners");
         required = _required;
     }
 
@@ -213,7 +213,7 @@ contract MultiSigIdentity {
         external
         returns(bool)
     {
-        require(!checkSign(transactionId, msg.sender));
+        require(!checkSign(transactionId, msg.sender), "The owner already signed this transaction");
         transactions[transactionId].signers[msg.sender] = true;
         transactions[transactionId].signCount = transactions[transactionId].signCount.add(1);
         emit LogTransactionSigned(msg.sender, transactionId, now);
@@ -233,7 +233,7 @@ contract MultiSigIdentity {
     {
         Transaction storage transaction = transactions[transactionId];
         transactions[transactionId].executed = true;
-        require(transaction.to.call.value(transaction.value)(transaction.data));
+        require(transaction.to.call.value(transaction.value)(transaction.data), "An error ocured when executing transaction");
         emit LogTransactionExecuted(msg.sender, transactionId, now);
         return true;
     }
