@@ -1,43 +1,73 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
+/**
+ * @title Identity 
+ * @dev Defines a personal identity with its owner and profile data. Allows execute transaction as a proxy
+ */
 contract Identity {
     
+    /**
+     * Storage
+     */
     address public owner;
     bytes public financialData;
 
-    event Forwarded(address destination, uint256 value, bytes data, uint256 timestamp);
-    event ProfileChanged(bytes financialData, uint256 timestamp);
+    /**
+     * Events   
+     */
+    event LogForwarded(address destination, uint256 value, bytes data, uint256 timestamp);
+    event LogProfileChanged(bytes financialData, uint256 timestamp);
 
+    /**
+     * Modifiers   
+     */
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "The user isn't identity's owner");
         _;
     }
 
-    function Identity(address _owner, bytes _financialData) 
+    /**
+     * @param _owner Address of Identity's owner
+     * @param _financialData Profile hash
+     */   
+    constructor(address _owner, bytes _financialData) 
         public
     {
         owner = _owner;
         financialData = _financialData;
     }
 
+    /**
+     * @dev Use the Identity as a proxy to execute transactions
+     * @param to Destiny of transaction
+     * @param value Transaction value
+     * @param data Encoded data of transaction.
+     * @return Success
+     */  
     function forward(address to, uint256 value, bytes data) 
         payable
         onlyOwner
-        public
+        external
         returns(bool)
     {
-        require(to.call.value(value)(data));
-        Forwarded(to, value, data, now);
+        require(to.call.value(value)(data), "An error ocured when executing transaction");
+        emit LogForwarded(to, value, data, now);
         return true;
     }
 
-
+    /**
+     * @dev Update Identity's profile
+     * @param _financialData New profile data's hash
+     * @return Success
+     */
     function setFinancialData(bytes _financialData)
         onlyOwner
-        public
+        external
+        returns(bool)
     {
         financialData = _financialData;
-        ProfileChanged(financialData, now);
+        emit LogProfileChanged(financialData, now);
+        return true;
     }
 
     

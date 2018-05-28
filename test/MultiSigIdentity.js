@@ -42,7 +42,7 @@ contract("MultiSigIdentity", async accounts => {
             2,
             { from: identityOwner_1 }
         )
-        const event = logs.find(e => e.event === "IdentityCreated")
+        const event = logs.find(e => e.event === "LogIdentityCreated")
         const args = event.args
         multiSigIdentity = await MultiSigIdentity.at(args.identity)
 
@@ -110,7 +110,7 @@ contract("MultiSigIdentity", async accounts => {
                 transactionData,
                 { from: identityOwner_1 }
             )
-            const event = logs.find(e => e.event === "TransactionCreated")
+            const event = logs.find(e => e.event === "LogTransactionCreated")
             const args = event.args
             expect(args).to.include.all.keys([
                 "creator",
@@ -139,7 +139,7 @@ contract("MultiSigIdentity", async accounts => {
 
         it("should sign transactions", async () => {
             const {logs} = await multiSigIdentity.signTransaction(0, { from: identityOwner_1 })
-            const event = logs.find(e => e.event === "TransactionSigned")
+            const event = logs.find(e => e.event === "LogTransactionSigned")
             const args = event.args
             expect(args).to.include.all.keys([
                 "signer",
@@ -166,7 +166,7 @@ contract("MultiSigIdentity", async accounts => {
             await multiSigIdentity.signTransaction(0, { from: identityOwner_2 })
             await multiSigIdentity.signTransaction(0, { from: identityOwner_3 })
             const {logs} = await multiSigIdentity.executeTransaction(0, { from: identityOwner_1 })
-            const event = logs.find(e => e.event === "TransactionExecuted")
+            const event = logs.find(e => e.event === "LogTransactionExecuted")
             const args = event.args
             expect(args).to.include.all.keys([
                 "executor",
@@ -196,7 +196,7 @@ contract("MultiSigIdentity", async accounts => {
             await multiSigIdentity.signTransaction(1, { from: identityOwner_2 })
             await multiSigIdentity.signTransaction(1, { from: identityOwner_3 })
             const {logs} = await multiSigIdentity.executeTransaction(1, { from: identityOwner_1 })
-            const event = logs.find(e => e.event === "ProfileChanged")
+            const event = logs.find(e => e.event === "LogProfileChanged")
             const args = event.args
             expect(args).to.include.all.keys([
                 "financialData",
@@ -250,7 +250,7 @@ contract("MultiSigIdentity", async accounts => {
             await multiSigIdentity.signTransaction(4, { from: identityOwner_2 })
             await multiSigIdentity.signTransaction(4, { from: identityOwner_3 })
             const {logs} = await multiSigIdentity.executeTransaction(4, { from: identityOwner_1 })
-            const event = logs.find(e => e.event === "RequiredChanged")
+            const event = logs.find(e => e.event === "LogRequiredChanged")
             const args = event.args
             expect(args).to.include.all.keys([
                 "required",
@@ -289,7 +289,7 @@ contract("MultiSigIdentity", async accounts => {
             await multiSigIdentity.signTransaction(6, { from: identityOwner_2 })
             await multiSigIdentity.signTransaction(6, { from: identityOwner_3 })
             const {logs} = await multiSigIdentity.executeTransaction(6, { from: identityOwner_1 })
-            const event = logs.find(e => e.event === "OwnerAdded")
+            const event = logs.find(e => e.event === "LogOwnerAdded")
             const args = event.args
             expect(args).to.include.all.keys([
                 "owner",
@@ -328,7 +328,7 @@ contract("MultiSigIdentity", async accounts => {
             await multiSigIdentity.signTransaction(8, { from: identityOwner_3 })
             await multiSigIdentity.signTransaction(8, { from: identityOwner_4 })
             const {logs} = await multiSigIdentity.executeTransaction(8, { from: identityOwner_1 })
-            const event = logs.find(e => e.event === "OwnerRemoved")
+            const event = logs.find(e => e.event === "LogOwnerRemoved")
             const args = event.args
             expect(args).to.include.all.keys([
                 "owner",
